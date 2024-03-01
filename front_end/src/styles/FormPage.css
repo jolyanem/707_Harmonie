@@ -1,0 +1,85 @@
+.rectangle-230 {
+    position: absolute;
+    background-color: #FAFBFC;
+    width: 100%;
+    height: 100vh;
+    top:0;
+    overflow-y: auto;
+  }
+  
+  .rectangle-228 {
+    position: absolute;
+    background-color: #EBF1FA;
+    width: 20%;
+    height: 100vh;
+    top:0;
+  }
+  
+  .form-square-URS {
+    position: absolute;
+    width: 75%; 
+    height: 60%; 
+    background:#FFFFFF;
+    border-radius: 15px;
+    left: 60%;
+    top: 400px;
+    transform: translate(-50%, -50%);
+    justify-content: space-between;
+  }
+  
+  .form-square-level1 {
+    position:absolute;
+    width: 75%; 
+    height: 30%; 
+    background:#FFFFFF;
+    border-radius: 15px;
+    left: 60%;
+    top: 780px;
+    transform: translate(-50%, -50%);
+    justify-content: space-between;
+  }
+  .form-square-level2 {
+    position:absolute;
+    width: 75%; 
+    height: 30%; 
+    background:#FFFFFF;
+    border-radius: 15px;
+    left: 60%;
+    top: 1045px;
+    transform: translate(-50%, -50%);
+    justify-content: space-between;
+  }
+  
+  .form-square-level3 {
+    position:absolute;
+    width: 75%; 
+    height: 30%; 
+    background:#FFFFFF;
+    border-radius: 15px;
+    left: 60%;
+    top: 1000px;
+    transform: translate(-50%, -50%);
+    justify-content: space-between;
+  }
+
+  .rectangle-form {
+    box-sizing: border-box;
+    position: absolute;
+    background: #FAFBFC;
+    border: 1px solid #C3C3C3;
+    border-radius: 8px;
+    width: 45%;
+    height: 50px;
+  }
+  
+  .rectangle-form-big {
+    box-sizing: border-box;
+    position: absolute;
+    background: #FAFBFC;
+    border: 1px solid #C3C3C3;
+    border-radius: 8px;
+    width: 94%;
+    height: 20%;
+    }
+  
+  
