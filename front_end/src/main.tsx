@@ -1,21 +1,114 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import { StrictMode } from 'react';
+import ReactDOM from 'react-dom/client';
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
+  Outlet,
+  RouterProvider,
+  createRouter,
+  createRoute,
+  createRootRoute,
+} from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/router-devtools';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import IndexPage from './routes';
+import URSFichePage from './routes/projects/urs/fiche';
+import Layout from '~/components/layout';
+import ProjetsPage from '~/routes/projects';
+import UsersPage from '~/routes/users';
+import { Toaster } from 'sonner';
+import axios from 'axios';
+import URSListPage from '~/routes/projects/urs';
+import ProjectPage from '~/routes/projects/details';
 
-const queryClient = new QueryClient()
+import type { ProjectDto, URSDto } from 'backend-types';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-<QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
-  </React.StrictMode>,
-)
+import './index.css';
+import '@fontsource-variable/inter';
+
+const queryClient = new QueryClient();
+
+const API_URL = 'http://localhost:3000';
+
+axios.defaults.baseURL = API_URL;
+
+const rootRoute = createRootRoute({
+  component: () => (
+    <Layout>
+      <Outlet />
+      <TanStackRouterDevtools />
+    </Layout>
+  ),
+});
+
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: IndexPage,
+});
+
+const usersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/users',
+  component: UsersPage,
+});
+
+const projectsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/projects',
+  loader: () =>
+    axios.get<Array<ProjectDto>>('/projects').then((res) => res.data),
+  component: ProjetsPage,
+});
+
+const projectRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/projects/$projectId',
+  loader: ({ params }) =>
+    axios
+      .get<ProjectDto>(`/projects/${params.projectId}`)
+      .then((res) => res.data),
+  component: ProjectPage,
+});
+
+const ursListeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/projects/$projectId/urs',
+  component: URSListPage,
+});
+
+const ursFicheRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/projects/$projectId/urs/$id',
+  loader: ({ params }) =>
+    axios.get<URSDto>(`/urs/${params.id}`).then((res) => res.data),
+  component: URSFichePage,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  usersRoute,
+  projectsRoute,
+  projectRoute,
+  ursListeRoute,
+  ursFicheRoute,
+]);
+
+const router = createRouter({ routeTree });
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
+}
+
+const rootElement = document.getElementById('root')!;
+if (!rootElement.innerHTML) {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <Toaster />
+      </QueryClientProvider>
+    </StrictMode>
+  );
+}
