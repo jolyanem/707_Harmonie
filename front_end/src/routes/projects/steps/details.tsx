@@ -1,19 +1,15 @@
 import { Link, useLoaderData, useParams } from '@tanstack/react-router';
-import CreateURSDialog from '~/components/URS/CreateURSDialog';
 
-const URSListPage = () => {
-  const urs = useLoaderData({
-    from: '/projects/$projectId/urs',
+const StepPage = () => {
+  const { projectId, stepName } = useParams({
+    from: '/projects/$projectId/steps/$stepName',
   });
-  const { projectId } = useParams({
-    from: '/projects/$projectId/urs',
+  const urs = useLoaderData({
+    from: '/projects/$projectId/steps/$stepName',
   });
   return (
-    <div>
-      <header className="flex items-center justify-between">
-        <h1 className="font-bold text-2xl">Toutes les URS</h1>
-        <CreateURSDialog projectId={projectId} />
-      </header>
+    <>
+      <h1 className="font-bold text-2xl">{stepName}</h1>
       <section className="mt-4">
         <div className="grid grid-cols-5 bg-white rounded-lg px-4 py-2 text-[#284E91] font-semibold">
           <div>Code</div>
@@ -36,8 +32,8 @@ const URSListPage = () => {
           </Link>
         ))}
       </section>
-    </div>
+    </>
   );
 };
 
-export default URSListPage;
+export default StepPage;

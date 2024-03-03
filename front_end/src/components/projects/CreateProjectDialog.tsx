@@ -44,7 +44,7 @@ const CreateProjectDialog = () => {
       navigate({
         to: `/projects/$projectId`,
         params: {
-          projectId: res.data.id,
+          projectId: res.data.id.toString(),
         },
       });
     },

@@ -16,11 +16,15 @@ export const AllSteps = ({ ursId, steps }: Props) => {
   return (
     <>
       {steps.map((step) => {
-        if (step.name === '1_2') {
-          return <Step1_2 key={step.name} ursId={ursId} step={step} />;
-        }
-        if (step.name === '1_3') {
-          return <Step1_3 key={step.name} ursId={ursId} step={step} />;
+        switch (step.name) {
+          case '1_2':
+            return <Step1_2 key={step.name} ursId={ursId} step={step} />;
+          case '1_3':
+            return <Step1_3 key={step.name} ursId={ursId} step={step} />;
+          // case '3_1':
+          //   return <Step3_1 key={step.name} ursId={ursId} step={step} />;
+          default:
+            break;
         }
         return null;
       })}

@@ -21,13 +21,16 @@ model Project {
 }
 
 model URS {
-  id            String         @id @default(uuid())
-  code          String         @db.Text
-  name          String         @db.Text
-  type          String         @db.Text
-  description   String         @db.Text
-  categorySteps CategoryStep[]
-  steps         Step[]
+  id                String         @id @default(uuid())
+  code              String         @db.Text
+  name              String         @db.Text
+  type              String         @db.Text
+  description       String         @db.Text
+  processType       String         @db.Text
+  criticalityClient String         @db.Text
+  criticalityVSI    String         @db.Text
+  categorySteps     CategoryStep[]
+  steps             Step[]
 
   project   Project @relation(fields: [projectId], references: [id])
   projectId Int

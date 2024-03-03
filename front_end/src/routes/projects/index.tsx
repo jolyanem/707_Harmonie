@@ -8,7 +8,9 @@ const ProjectsPage = () => {
 
   return (
     <div>
-      <CreateProjectDialog />
+      <div className="flex justify-end">
+        <CreateProjectDialog />
+      </div>
       <section className="mt-4">
         <div className="grid grid-cols-6 bg-white rounded-lg px-4 py-2 text-[#284E91] font-semibold">
           <div>ID</div>
@@ -19,7 +21,7 @@ const ProjectsPage = () => {
           <Link
             key={project.id}
             to="/projects/$projectId"
-            params={{ projectId: project.id }}
+            params={{ projectId: project.id.toString() }}
             className="grid grid-cols-6 mt-2 px-4 py-2 bg-white rounded-lg"
           >
             <div>{project.id}</div>

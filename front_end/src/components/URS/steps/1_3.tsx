@@ -25,6 +25,8 @@ import {
 
 const step1_3Schema = z.object({
   status: z.string(),
+  criticalityClient: z.string(),
+  criticalityVSI: z.string(),
 });
 
 const Step1_3 = ({ ursId, step }: StepProps) => {

@@ -39,6 +39,7 @@ const createURSSchema = z.object({
   type: z.string(),
   description: z.string().max(400),
   code: z.string(),
+  processType: z.string(),
 });
 
 type Props = {
@@ -53,7 +54,7 @@ const CreateURSDialog = ({ projectId }: Props) => {
     mutationFn: (values: z.infer<typeof createURSSchema>) =>
       axios.post<URSDto>(`/urs`, {
         ...values,
-        projectId,
+        projectId: parseInt(projectId),
       } satisfies URSCreateDto),
     onSuccess: (res) => {
       toast.success('URS créée avec succès');
@@ -75,6 +76,7 @@ const CreateURSDialog = ({ projectId }: Props) => {
       type: 'macro',
       description: '',
       code: '',
+      processType: 'achats',
     },
   });
 
@@ -157,6 +159,31 @@ const CreateURSDialog = ({ projectId }: Props) => {
                   <FormControl>
                     <Textarea className="resize-none" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <hr className="col-span-2" />
+            <FormField
+              control={form.control}
+              name="processType"
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>Process type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="achats">Achats</SelectItem>
+                      <SelectItem value="stocks">Stocks</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

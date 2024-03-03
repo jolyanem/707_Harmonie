@@ -19,14 +19,20 @@ import axios from 'axios';
 import URSListPage from '~/routes/projects/urs';
 import ProjectPage from '~/routes/projects/details';
 
-import type { ProjectDto, URSDto } from 'backend-types';
+import type {
+  ProjectDetailedDto,
+  ProjectDto,
+  URSDto,
+  URSShortDto,
+} from 'backend-types';
 
 import './index.css';
 import '@fontsource-variable/inter';
+import StepPage from '~/routes/projects/steps/details';
 
 const queryClient = new QueryClient();
 
-const API_URL = 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL;
 
 axios.defaults.baseURL = API_URL;
 
@@ -64,14 +70,30 @@ const projectRoute = createRoute({
   path: '/projects/$projectId',
   loader: ({ params }) =>
     axios
-      .get<ProjectDto>(`/projects/${params.projectId}`)
+      .get<ProjectDetailedDto>(`/projects/${params.projectId}`)
       .then((res) => res.data),
   component: ProjectPage,
+});
+
+const stepRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/projects/$projectId/steps/$stepName',
+  loader: ({ params }) =>
+    axios
+      .get<Array<URSShortDto>>(
+        `/projects/${params.projectId}/steps/${params.stepName}`
+      )
+      .then((res) => res.data),
+  component: StepPage,
 });
 
 const ursListeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/projects/$projectId/urs',
+  loader: ({ params }) =>
+    axios
+      .get<Array<URSDto>>(`/projects/${params.projectId}/urs`)
+      .then((res) => res.data),
   component: URSListPage,
 });
 
@@ -88,6 +110,7 @@ const routeTree = rootRoute.addChildren([
   usersRoute,
   projectsRoute,
   projectRoute,
+  stepRoute,
   ursListeRoute,
   ursFicheRoute,
 ]);
