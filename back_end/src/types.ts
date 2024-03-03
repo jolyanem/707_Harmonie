@@ -5,6 +5,9 @@ import type {
   Project,
   SupplierResponse,
   AuditTrail,
+  Risk,
+  Cause,
+  ActionPlan,
 } from '@prisma/client';
 
 export type CategoryStepDto = Pick<CategoryStep, 'id' | 'name' | 'level'>;
@@ -28,6 +31,27 @@ export type AuditTrailDto = Pick<
   'id' | 'revue' | 'revueComment' | 'consultationComment' | 'consultation'
 >;
 
+export type CauseDto = Pick<Cause, 'id' | 'probability' | 'type'>;
+
+export type ActionPlanDto = Pick<
+  ActionPlan,
+  'id' | 'qp' | 'datamigration' | 'revueConfig' | 'documentation' | 'qiqo'
+>;
+
+export type RiskDto = Pick<
+  Risk,
+  | 'id'
+  | 'impact'
+  | 'comment'
+  | 'consequence'
+  | 'deficiencyDescription'
+  | 'riskClass'
+  | 'riskResidueLevel'
+> & {
+  causes: Array<CauseDto>;
+  actionPlan: ActionPlanDto;
+};
+
 export type URSShortDto = Pick<URS, 'id' | 'code' | 'type' | 'name'>;
 
 export type URSDto = Pick<
@@ -46,6 +70,7 @@ export type URSDto = Pick<
   steps: Array<StepDto>;
   supplierResponses: Array<SupplierResponsesDto>;
   auditTrail: AuditTrailDto;
+  risks: Array<RiskDto>;
 };
 
 export type URSCreateDto = Pick<

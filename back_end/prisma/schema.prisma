@@ -33,11 +33,15 @@ model URS {
   categorySteps     CategoryStep[]
   steps             Step[]
 
-  project           Project            @relation(fields: [projectId], references: [id])
-  projectId         Int
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId Int
+
   supplierResponses SupplierResponse[]
-  auditTrail        AuditTrail         @relation(fields: [auditTrailId], references: [id])
-  auditTrailId      String             @unique
+
+  auditTrail   AuditTrail @relation(fields: [auditTrailId], references: [id])
+  auditTrailId String     @unique
+
+  risks Risk[]
 }
 
 model CategoryStep {
@@ -62,14 +66,14 @@ model Step {
 }
 
 model SupplierResponse {
-  id              String   @id @default(uuid())
-  name            String   @db.Text
-  statut          Boolean  @default(false)
-  answer          String   @db.Text
-  type            String   @db.Text // Custom or Standard
-  customTmpsDev   Float?
-  customCost      Float?
-  customApprouved Boolean?
+  id              String  @id @default(uuid())
+  name            String  @db.Text
+  statut          Boolean @default(false)
+  answer          String  @db.Text
+  type            String  @db.Text // Custom or Standard
+  customTmpsDev   Float   @default(0)
+  customCost      Float   @default(0)
+  customApprouved Boolean @default(false)
 
   URS   URS    @relation(fields: [URSId], references: [id])
   URSId String
@@ -82,4 +86,42 @@ model AuditTrail {
   revue               Boolean
   revueComment        String  @db.Text
   URS                 URS?
+}
+
+model Risk {
+  id                    String @id @default(uuid())
+  deficiencyDescription String @db.Text
+  riskClass             String @db.Text
+  consequence           String @db.Text
+  impact                Int
+  riskResidueLevel      String @db.Text
+  comment               String @db.Text
+
+  causes Cause[]
+
+  actionPlan   ActionPlan @relation(fields: [actionPlanId], references: [id])
+  actionPlanId String     @unique
+
+  URS   URS    @relation(fields: [URSId], references: [id])
+  URSId String
+}
+
+model Cause {
+  id          String @id @default(uuid())
+  type        String @db.Text
+  probability Int
+
+  risk   Risk?   @relation(fields: [riskId], references: [id])
+  riskId String?
+}
+
+model ActionPlan {
+  id            String  @id @default(uuid())
+  qiqo          Boolean
+  documentation Boolean
+  datamigration Boolean
+  revueConfig   Boolean
+  qp            Boolean
+
+  Risk Risk?
 }

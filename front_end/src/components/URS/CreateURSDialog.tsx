@@ -76,7 +76,7 @@ const CreateURSDialog = ({ projectId }: Props) => {
       type: 'macro',
       description: '',
       code: '',
-      processType: 'achats',
+      processType: '',
     },
   });
 
@@ -170,20 +170,9 @@ const CreateURSDialog = ({ projectId }: Props) => {
               render={({ field }) => (
                 <FormItem className="col-span-2">
                   <FormLabel>Process type</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="achats">Achats</SelectItem>
-                      <SelectItem value="stocks">Stocks</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input placeholder="" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

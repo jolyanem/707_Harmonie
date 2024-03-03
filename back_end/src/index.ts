@@ -4,6 +4,7 @@ import { db } from './db';
 import type {
   ProjectDetailedDto,
   ProjectDto,
+  RiskDto,
   SupplierResponsesDto,
   URSDto,
   URSPutDto,
@@ -34,6 +35,12 @@ app
         steps: true,
         supplierResponses: true,
         auditTrail: true,
+        risks: {
+          include: {
+            causes: true,
+            actionPlan: true,
+          },
+        },
       },
     });
     if (!urs) {
@@ -262,6 +269,121 @@ app
         });
       }
     }
+    if (step.name === '6_7') {
+      const newRisks = req.body.risks as Array<RiskDto>;
+      const oldRisks = await db.risk.findMany({
+        where: {
+          URSId: ursId,
+        },
+      });
+      const risksToDelete = oldRisks.filter(
+        (oldRisk) => !newRisks.some((risk) => risk.id === oldRisk.id)
+      );
+      for (const risk of risksToDelete) {
+        await db.risk.delete({
+          where: {
+            id: risk.id,
+          },
+        });
+      }
+      for (const risk of newRisks) {
+        const oldCauses = await db.cause.findMany({
+          where: {
+            riskId: risk.id,
+          },
+        });
+        const newCauses = risk.causes.filter(
+          (cause) => !oldCauses.some((oldCause) => oldCause.id === cause.id)
+        );
+        const causesToDelete = oldCauses.filter(
+          (oldCause) => !risk.causes.some((cause) => cause.id === oldCause.id)
+        );
+        const causesToUpdate = risk.causes.filter((cause) =>
+          oldCauses.some((oldCause) => oldCause.id === cause.id)
+        );
+        for (const cause of causesToDelete) {
+          await db.cause.delete({
+            where: {
+              id: cause.id,
+            },
+          });
+        }
+        for (const cause of causesToUpdate) {
+          await db.cause.update({
+            where: {
+              id: cause.id,
+            },
+            data: {
+              probability: cause.probability,
+              type: cause.type,
+            },
+          });
+        }
+        for (const cause of newCauses) {
+          await db.cause.create({
+            data: {
+              probability: cause.probability,
+              type: cause.type,
+              risk: {
+                connect: {
+                  id: risk.id,
+                },
+              },
+            },
+          });
+        }
+        await db.risk.upsert({
+          where: {
+            id: risk.id,
+          },
+          update: {
+            impact: risk.impact,
+            comment: risk.comment,
+            consequence: risk.consequence,
+            deficiencyDescription: risk.deficiencyDescription,
+            riskClass: risk.riskClass,
+            riskResidueLevel: risk.riskResidueLevel,
+            actionPlan: {
+              update: {
+                qp: risk.actionPlan.qp,
+                datamigration: risk.actionPlan.datamigration,
+                revueConfig: risk.actionPlan.revueConfig,
+                documentation: risk.actionPlan.documentation,
+                qiqo: risk.actionPlan.qiqo,
+              },
+            },
+          },
+          create: {
+            id: risk.id,
+            impact: risk.impact,
+            comment: risk.comment,
+            consequence: risk.consequence,
+            deficiencyDescription: risk.deficiencyDescription,
+            riskClass: risk.riskClass,
+            riskResidueLevel: risk.riskResidueLevel,
+            URS: {
+              connect: {
+                id: ursId,
+              },
+            },
+            causes: {
+              createMany: {
+                data: risk.causes,
+              },
+            },
+            actionPlan: {
+              create: {
+                qp: risk.actionPlan.qp,
+                datamigration: risk.actionPlan.datamigration,
+                revueConfig: risk.actionPlan.revueConfig,
+                documentation: risk.actionPlan.documentation,
+                qiqo: risk.actionPlan.qiqo,
+              },
+            },
+          },
+        });
+      }
+    }
     if (step.name === '8_4') {
       await db.auditTrail.update({
         where: {
@@ -335,6 +457,12 @@ app
         steps: true,
         supplierResponses: true,
         auditTrail: true,
+        risks: {
+          include: {
+            causes: true,
+            actionPlan: true,
+          },
+        },
       },
     });
     res.json(urs satisfies Array<URSDto>);

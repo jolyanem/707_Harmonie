@@ -7,6 +7,14 @@ import { Edit2Icon } from 'lucide-react';
 import { useLoaderData } from '@tanstack/react-router';
 import Step4_4 from '~/components/URS/steps/4_4';
 import Step8_4 from '~/components/URS/steps/8_4';
+import Step6_7 from '~/components/URS/steps/6_7';
+import Step3_1 from '~/components/URS/steps/3_1';
+import Step3_2 from '~/components/URS/steps/3_2';
+import Step6_5 from '~/components/URS/steps/6_5';
+import Step7_1 from '~/components/URS/steps/7_1';
+import Step7_2 from '~/components/URS/steps/7_2';
+import Step9_4 from '~/components/URS/steps/9_4';
+import Step8_2 from '~/components/URS/steps/8_2';
 
 export type StepProps = {
   ursId: URSDto['id'];
@@ -45,6 +53,24 @@ const StepWrapper = ({ ursId, step }: StepProps) => {
                 criticalityVSI={urs.criticalityVSI}
               />
             );
+          case '3_1':
+            return (
+              <Step3_1
+                ursId={ursId}
+                step={step}
+                readonly={readonly}
+                setReadonly={setReadonly}
+              />
+            );
+          case '3_2':
+            return (
+              <Step3_2
+                ursId={ursId}
+                step={step}
+                readonly={readonly}
+                setReadonly={setReadonly}
+              />
+            );
           case '4_4':
             return (
               <Step4_4
@@ -55,6 +81,52 @@ const StepWrapper = ({ ursId, step }: StepProps) => {
                 supplierResponses={urs.supplierResponses}
               />
             );
+          case '6_5':
+            return (
+              <Step6_5
+                ursId={ursId}
+                step={step}
+                readonly={readonly}
+                setReadonly={setReadonly}
+              />
+            );
+          case '6_7':
+            return (
+              <Step6_7
+                ursId={ursId}
+                step={step}
+                readonly={readonly}
+                setReadonly={setReadonly}
+                risks={urs.risks}
+              />
+            );
+          case '7_1':
+            return (
+              <Step7_1
+                ursId={ursId}
+                step={step}
+                readonly={readonly}
+                setReadonly={setReadonly}
+              />
+            );
+          case '7_2':
+            return (
+              <Step7_2
+                ursId={ursId}
+                step={step}
+                readonly={readonly}
+                setReadonly={setReadonly}
+              />
+            );
+          case '8_2':
+            return (
+              <Step8_2
+                ursId={ursId}
+                step={step}
+                readonly={readonly}
+                setReadonly={setReadonly}
+              />
+            );
           case '8_4':
             return (
               <Step8_4
@@ -63,6 +135,15 @@ const StepWrapper = ({ ursId, step }: StepProps) => {
                 readonly={readonly}
                 setReadonly={setReadonly}
                 auditTrail={urs.auditTrail}
+              />
+            );
+          case '9_4':
+            return (
+              <Step9_4
+                ursId={ursId}
+                step={step}
+                readonly={readonly}
+                setReadonly={setReadonly}
               />
             );
           default:
