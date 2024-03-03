@@ -4,6 +4,7 @@ import { db } from './db';
 import type {
   ProjectDetailedDto,
   ProjectDto,
+  SupplierResponsesDto,
   URSDto,
   URSPutDto,
   URSShortDto,
@@ -31,6 +32,8 @@ app
       include: {
         categorySteps: true,
         steps: true,
+        supplierResponses: true,
+        auditTrail: true,
       },
     });
     if (!urs) {
@@ -47,8 +50,8 @@ app
         type: req.body.type,
         description: req.body.description,
         processType: req.body.processType,
-        criticalityClient: 'N',
-        criticalityVSI: 'N',
+        criticalityClient: 'na',
+        criticalityVSI: 'na',
         steps: {
           create: [
             {
@@ -106,13 +109,17 @@ app
             id: req.body.projectId,
           },
         },
-      },
-      include: {
-        categorySteps: true,
-        steps: true,
+        auditTrail: {
+          create: {
+            revue: false,
+            revueComment: '',
+            consultation: false,
+            consultationComment: '',
+          },
+        },
       },
     });
-    res.json(urs satisfies URSDto);
+    res.json(urs satisfies URSShortDto);
   })
   .put('/urs/:id', async (req, res) => {
     console.log('[PUT] URS :', req.params.id);
@@ -127,10 +134,6 @@ app
         description: body.description,
         type: body.type,
         processType: body.processType,
-      },
-      include: {
-        categorySteps: true,
-        steps: true,
       },
     });
     const oldSteps = await db.categoryStep.findMany({
@@ -148,19 +151,20 @@ app
         },
       });
     }
-    for (const step of body.categorySteps) {
+    for (let index = 0; index < body.categorySteps.length; index++) {
+      const step = body.categorySteps[index]!;
       await db.categoryStep.upsert({
         where: {
           id: step.id,
         },
         update: {
           name: step.name,
-          level: step.level,
+          level: index + 1,
         },
         create: {
           id: step.id,
           name: step.name,
-          level: step.level,
+          level: index + 1,
           URS: {
             connect: {
               id: urs.id,
@@ -169,7 +173,7 @@ app
         },
       });
     }
-    res.json(urs satisfies URSDto);
+    res.json(urs satisfies URSShortDto);
   })
   .put('/urs/:ursId/step/:stepName', async (req, res) => {
     console.log(
@@ -193,16 +197,93 @@ app
         updatedBy: '',
       },
     });
+    if (step.name === '1_3') {
+      await db.uRS.update({
+        where: {
+          id: ursId,
+        },
+        data: {
+          criticalityClient: req.body.criticalityClient,
+          criticalityVSI: req.body.criticalityVSI,
+        },
+      });
+    }
+    if (step.name === '4_4') {
+      const newSupplierResponses = req.body
+        .supplierResponses as Array<SupplierResponsesDto>;
+      const oldSupplierResponses = await db.supplierResponse.findMany({
+        where: {
+          URSId: ursId,
+        },
+      });
+      const supplierResponsesToDelete = oldSupplierResponses.filter(
+        (oldSupplierResponse) =>
+          !newSupplierResponses.some(
+            (supplierResponse) => supplierResponse.id === oldSupplierResponse.id
+          )
+      );
+      for (const supplierResponse of supplierResponsesToDelete) {
+        await db.supplierResponse.delete({
+          where: {
+            id: supplierResponse.id,
+          },
+        });
+      }
+      for (const supplierResponse of newSupplierResponses) {
+        const isCustomType = supplierResponse.type === 'custom';
+        await db.supplierResponse.upsert({
+          where: {
+            id: supplierResponse.id,
+          },
+          update: {
+            answer: supplierResponse.answer,
+            name: supplierResponse.name,
+            statut: supplierResponse.statut,
+            type: supplierResponse.type,
+            customApprouved: isCustomType
+              ? supplierResponse.customApprouved
+              : false,
+            customCost: isCustomType ? supplierResponse.customCost : 0,
+            customTmpsDev: isCustomType ? supplierResponse.customTmpsDev : 0,
+          },
+          create: {
+            id: supplierResponse.id,
+            answer: supplierResponse.answer,
+            name: supplierResponse.name,
+            statut: supplierResponse.statut,
+            type: supplierResponse.type,
+            URSId: ursId,
+            customApprouved: isCustomType
+              ? supplierResponse.customApprouved
+              : false,
+            customCost: isCustomType ? supplierResponse.customCost : 0,
+            customTmpsDev: isCustomType ? supplierResponse.customTmpsDev : 0,
+          },
+        });
+      }
+    }
+    if (step.name === '8_4') {
+      await db.auditTrail.update({
+        where: {
+          id: req.body.auditTrail.id,
+        },
+        data: {
+          revue: req.body.auditTrail.revue,
+          revueComment: req.body.auditTrail.revueComment,
+          consultation: req.body.auditTrail.consultation,
+          consultationComment: req.body.auditTrail.consultationComment,
+        },
+      });
+    }
     res.json(step);
   });
 
-app.get('/projects', async (req, res) => {
-  console.log('[GET] Projects');
-  const projects = await db.project.findMany();
-  res.json(projects satisfies Array<ProjectDto>);
-});
-
 app
+  .get('/projects', async (req, res) => {
+    console.log('[GET] Projects');
+    const projects = await db.project.findMany();
+    res.json(projects satisfies Array<ProjectDto>);
+  })
   .post('/projects', async (req, res) => {
     console.log('[POST] Project :', req.body.name);
     const project = await db.project.create({
@@ -252,6 +333,8 @@ app
       include: {
         categorySteps: true,
         steps: true,
+        supplierResponses: true,
+        auditTrail: true,
       },
     });
     res.json(urs satisfies Array<URSDto>);

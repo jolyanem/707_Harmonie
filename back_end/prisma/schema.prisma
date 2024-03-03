@@ -17,7 +17,8 @@ model Project {
   id     Int    @id @default(autoincrement())
   name   String @db.Text
   client String @db.Text
-  URS    URS[]
+
+  URS URS[]
 }
 
 model URS {
@@ -32,8 +33,11 @@ model URS {
   categorySteps     CategoryStep[]
   steps             Step[]
 
-  project   Project @relation(fields: [projectId], references: [id])
-  projectId Int
+  project           Project            @relation(fields: [projectId], references: [id])
+  projectId         Int
+  supplierResponses SupplierResponse[]
+  auditTrail        AuditTrail         @relation(fields: [auditTrailId], references: [id])
+  auditTrailId      String             @unique
 }
 
 model CategoryStep {
@@ -55,4 +59,27 @@ model Step {
   URSId String
 
   @@id([URSId, name])
+}
+
+model SupplierResponse {
+  id              String   @id @default(uuid())
+  name            String   @db.Text
+  statut          Boolean  @default(false)
+  answer          String   @db.Text
+  type            String   @db.Text // Custom or Standard
+  customTmpsDev   Float?
+  customCost      Float?
+  customApprouved Boolean?
+
+  URS   URS    @relation(fields: [URSId], references: [id])
+  URSId String
+}
+
+model AuditTrail {
+  id                  String  @id @default(uuid())
+  consultation        Boolean
+  consultationComment String  @db.Text
+  revue               Boolean
+  revueComment        String  @db.Text
+  URS                 URS?
 }

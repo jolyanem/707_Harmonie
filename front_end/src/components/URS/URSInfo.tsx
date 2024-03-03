@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import type { URSDto } from 'backend-types';
-import { TrashIcon } from 'lucide-react';
+import { Edit2Icon, TrashIcon } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -26,6 +26,7 @@ import {
 } from '~/components/ui/select';
 import { Textarea } from '~/components/ui/textarea';
 import { Separator } from '~/components/ui/separator';
+import { useState } from 'react';
 
 type Props = {
   urs: Pick<
@@ -55,6 +56,7 @@ const ursInfoSchema = z.object({
 });
 
 const URSInfo = ({ urs }: Props) => {
+  const [readonly, setReadonly] = useState(true);
   const updateURSInfoMutation = useMutation({
     mutationKey: ['updateURSInfo', urs.id],
     mutationFn: (values: z.infer<typeof ursInfoSchema>) =>
@@ -72,6 +74,7 @@ const URSInfo = ({ urs }: Props) => {
       processType: urs.processType,
       categorySteps: urs.categorySteps,
     },
+    disabled: readonly,
   });
   const categoryStepsField = useFieldArray({
     control: form.control,
@@ -86,20 +89,24 @@ const URSInfo = ({ urs }: Props) => {
       processType: urs.processType,
       categorySteps: urs.categorySteps,
     });
+    setReadonly(true);
   };
 
   function onSubmit(values: z.infer<typeof ursInfoSchema>) {
-    console.log(values);
     updateURSInfoMutation.mutate(values);
+    setReadonly(true);
   }
 
   return (
     <div>
-      <h1 className="font-bold text-xl">FICHE URS | {urs.code}</h1>
+      <h1 className="font-bold text-xl">
+        <span className="text-gray-500">FICHE URS | </span>
+        <span>{urs.code}</span>
+      </h1>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="bg-white rounded-lg p-4 gap-4 mt-2"
+          className="bg-white rounded-lg p-4 gap-4 mt-2 relative"
         >
           <div className="grid grid-cols-2 gap-2">
             <FormField
@@ -124,6 +131,7 @@ const URSInfo = ({ urs }: Props) => {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={field.disabled}
                     value={field.value}
                   >
                     <FormControl>
@@ -154,7 +162,7 @@ const URSInfo = ({ urs }: Props) => {
               )}
             />
           </div>
-          <Separator className="my-4" />
+          <Separator className="my-4 w-3/4 mx-auto" />
           <div className="grid grid-cols-2">
             <FormField
               control={form.control}
@@ -163,20 +171,7 @@ const URSInfo = ({ urs }: Props) => {
                 <FormItem className="w-[30ch] mt-1">
                   <FormLabel>Process type</FormLabel>
                   <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="achats">Achats</SelectItem>
-                        <SelectItem value="stocks">Stocks</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Input placeholder="" {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -188,46 +183,61 @@ const URSInfo = ({ urs }: Props) => {
                   name={`categorySteps.${index}.name`}
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>Process step level {step.level}</FormLabel>
+                      <FormLabel>Process step level {index + 1}</FormLabel>
                       <FormControl>
                         <Input placeholder="" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  className="mt-auto mb-0.5"
-                  onClick={() => categoryStepsField.remove(index)}
-                >
-                  <TrashIcon size={18} />
-                </Button>
+                {!readonly && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="mt-auto mb-0.5"
+                    onClick={() => categoryStepsField.remove(index)}
+                  >
+                    <TrashIcon size={18} />
+                  </Button>
+                )}
               </div>
             ))}
-            <div className="col-span-2 text-center">
-              <Button
-                type="button"
-                className="mt-2"
-                onClick={() =>
-                  categoryStepsField.append({
-                    id: uuid(),
-                    name: '',
-                    level: categoryStepsField.fields.length + 1,
-                  })
-                }
-              >
-                Ajouter un process step
+            {!readonly && (
+              <div className="col-span-2 text-center">
+                <Button
+                  type="button"
+                  className="mt-2"
+                  onClick={() =>
+                    categoryStepsField.append({
+                      id: uuid(),
+                      name: '',
+                      level: categoryStepsField.fields.length + 1,
+                    })
+                  }
+                >
+                  Ajouter un process step
+                </Button>
+              </div>
+            )}
+          </div>
+          {!readonly && (
+            <div className="mt-4 text-center flex items-center justify-center gap-4">
+              <Button type="button" variant="secondary" onClick={cancel}>
+                Annuler
               </Button>
+              <Button type="submit">Valider</Button>
             </div>
-          </div>
-          <div className="mt-4 text-center flex items-center justify-center gap-4">
-            <Button type="button" variant="secondary" onClick={cancel}>
-              Annuler
+          )}
+          {readonly && (
+            <Button
+              size="icon"
+              className="p-O h-6 w-6 rounded-md absolute top-1 right-1.5 bg-slate-700 hover:bg-slate-900"
+              onClick={() => setReadonly(!readonly)}
+            >
+              <Edit2Icon size="12" />
             </Button>
-            <Button type="submit">Valider</Button>
-          </div>
+          )}
         </form>
       </Form>
     </div>

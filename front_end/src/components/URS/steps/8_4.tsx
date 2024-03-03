@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
 import axios from 'axios';
-import type { URSDto } from 'backend-types';
+import type { AuditTrailDto, URSDto } from 'backend-types';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -23,61 +23,55 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
+import { Textarea } from '~/components/ui/textarea';
 
 type Props = StepProps & {
-  criticalityClient: string;
-  criticalityVSI: string;
+  auditTrail: AuditTrailDto;
 };
 
-const step1_3Schema = z.object({
+const step8_4Schema = z.object({
   status: z.string(),
-  criticalityClient: z.string(),
-  criticalityVSI: z.string(),
+  auditTrail: z.object({
+    id: z.string(),
+    consultation: z.boolean(),
+    consultationComment: z.string(),
+    revue: z.boolean(),
+    revueComment: z.string(),
+  }),
 });
 
-const Step1_3 = ({
-  ursId,
-  step,
-  readonly,
-  setReadonly,
-  criticalityClient,
-  criticalityVSI,
-}: Props) => {
+const Step8_4 = ({ ursId, step, readonly, setReadonly, auditTrail }: Props) => {
   const router = useRouter();
   const updateStepMutation = useMutation({
-    mutationKey: ['updateStep', ursId, '1_3'],
-    mutationFn: (values: z.infer<typeof step1_3Schema>) =>
-      axios.put<URSDto>(`/urs/${ursId}/step/1_3`, values),
+    mutationKey: ['updateStep', ursId, '8_4'],
+    mutationFn: (values: z.infer<typeof step8_4Schema>) =>
+      axios.put<URSDto>(`/urs/${ursId}/step/8_4`, values),
     onSuccess: () => {
-      toast.success('Étape 1.3 mise à jour avec succès');
+      toast.success('Étape 8.4 mise à jour avec succès');
       setReadonly(true);
       router.invalidate();
     },
   });
 
-  const form = useForm<z.infer<typeof step1_3Schema>>({
-    resolver: zodResolver(step1_3Schema),
-    defaultValues: {
-      ...step,
-      criticalityClient: criticalityClient,
-      criticalityVSI: criticalityVSI,
-    },
+  const form = useForm<z.infer<typeof step8_4Schema>>({
+    resolver: zodResolver(step8_4Schema),
+    defaultValues: { ...step, auditTrail },
     disabled: readonly,
   });
 
   const cancel = () => {
-    setReadonly(true);
     form.reset(step);
+    setReadonly(true);
   };
 
-  function onSubmit(values: z.infer<typeof step1_3Schema>) {
+  function onSubmit(values: z.infer<typeof step8_4Schema>) {
     updateStepMutation.mutate(values);
   }
 
   return (
     <div>
       <h2 className="font-semibold text-lg uppercase">
-        ÉTAPE 1.3 | ÉTUDE CRITICITÉ
+        ÉTAPE 8.4 | Vérifications Opérationnelles (VO)
       </h2>
       <Form {...form}>
         <form
@@ -114,15 +108,15 @@ const Step1_3 = ({
           />
           <FormField
             control={form.control}
-            name="criticalityClient"
+            name="auditTrail.consultation"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Criticité Client</FormLabel>
+                <FormLabel>Consultation de l’Audit Trail</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  onValueChange={(value) => field.onChange(value === 'true')}
+                  defaultValue={field.value ? 'true' : 'false'}
                   disabled={field.disabled}
-                  value={field.value}
+                  value={field.value ? 'true' : 'false'}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -130,9 +124,8 @@ const Step1_3 = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="na">Non renseigné</SelectItem>
-                    <SelectItem value="N">Non</SelectItem>
-                    <SelectItem value="Y">Oui</SelectItem>
+                    <SelectItem value="false">Non</SelectItem>
+                    <SelectItem value="true">Oui</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -141,15 +134,15 @@ const Step1_3 = ({
           />
           <FormField
             control={form.control}
-            name="criticalityVSI"
+            name="auditTrail.revue"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Criticité VSI</FormLabel>
+                <FormLabel>Revue de l’Audit Trail</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  onValueChange={(value) => field.onChange(value === 'true')}
+                  defaultValue={field.value ? 'true' : 'false'}
                   disabled={field.disabled}
-                  value={field.value}
+                  value={field.value ? 'true' : 'false'}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -157,11 +150,38 @@ const Step1_3 = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="na">Non renseigné</SelectItem>
-                    <SelectItem value="N">Non</SelectItem>
-                    <SelectItem value="Y">Oui</SelectItem>
+                    <SelectItem value="false">Non</SelectItem>
+                    <SelectItem value="true">Oui</SelectItem>
                   </SelectContent>
                 </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="auditTrail.consultationComment"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Consultation de l’Audit Trail | Commentaires
+                </FormLabel>
+                <FormControl>
+                  <Textarea {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="auditTrail.revueComment"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Revue de l’Audit Trail | Commentaires</FormLabel>
+                <FormControl>
+                  <Textarea {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -175,7 +195,7 @@ const Step1_3 = ({
             </div>
           )}
           {step.updatedAt && (
-            <div className="text-gray-300 uppercase text-sm col-span-2">
+            <div className="text-gray-300 uppercase col-span-2 text-sm">
               MAJ le {new Date(step.updatedAt).toLocaleDateString()} par{' '}
               {step.updatedBy}
             </div>
@@ -186,4 +206,4 @@ const Step1_3 = ({
   );
 };
 
-export default Step1_3;
+export default Step8_4;

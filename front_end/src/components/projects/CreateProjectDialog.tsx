@@ -39,7 +39,7 @@ const CreateProjectDialog = () => {
     mutationFn: (values: z.infer<typeof createProjectSchema>) =>
       axios.post<ProjectDto>(`/projects`, values satisfies ProjectCreateDto),
     onSuccess: (res) => {
-      toast.success('Project créée avec succès');
+      toast.success('Project créé avec succès');
       setOpen(false);
       navigate({
         to: `/projects/$projectId`,
