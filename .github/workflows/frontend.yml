@@ -48,6 +48,7 @@ jobs:
       contents: read
       packages: write
       id-token: write
+    needs: build-frontend
     env:
       working-directory: front_end/
     steps:
