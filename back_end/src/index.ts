@@ -32,7 +32,11 @@ app
       },
       include: {
         categorySteps: true,
-        steps: true,
+        steps: {
+          orderBy: {
+            name: 'asc',
+          },
+        },
         supplierResponses: true,
         auditTrail: true,
         risks: {
@@ -509,7 +513,11 @@ app
       },
       include: {
         categorySteps: true,
-        steps: true,
+        steps: {
+          orderBy: {
+            name: 'asc',
+          },
+        },
         supplierResponses: true,
         auditTrail: true,
         risks: {
