@@ -125,6 +125,7 @@ const StepWrapper = ({ ursId, step }: StepProps) => {
                 step={step}
                 readonly={readonly}
                 setReadonly={setReadonly}
+                risks={urs.risks}
               />
             );
           case '8_4':

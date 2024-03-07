@@ -39,6 +39,7 @@ app
           include: {
             causes: true,
             actionPlan: true,
+            tests: true,
           },
         },
       },
@@ -384,6 +385,60 @@ app
         });
       }
     }
+    if (step.name === '8_2') {
+      const risks = req.body.risks as Array<RiskDto>;
+      for (const risk of risks) {
+        const oldTests = await db.test.findMany({
+          where: {
+            risk: {
+              id: risk.id,
+            },
+          },
+        });
+        const testsToDelete = oldTests.filter(
+          (oldTest) => !risk.tests.some((test) => test.id === oldTest.id)
+        );
+        for (const test of testsToDelete) {
+          await db.test.delete({
+            where: {
+              id: test.id,
+            },
+          });
+        }
+        const newTests = risk.tests.filter(
+          (test) => !oldTests.some((oldTest) => oldTest.id === test.id)
+        );
+        for (const test of newTests) {
+          await db.test.create({
+            data: {
+              name: test.name,
+              documentation: test.documentation,
+              comments: test.comments,
+              risk: {
+                connect: {
+                  id: risk.id,
+                },
+              },
+            },
+          });
+        }
+        const testsToUpdate = risk.tests.filter((test) =>
+          oldTests.some((oldTest) => oldTest.id === test.id)
+        );
+        for (const test of testsToUpdate) {
+          await db.test.update({
+            where: {
+              id: test.id,
+            },
+            data: {
+              name: test.name,
+              comments: test.comments,
+              documentation: test.documentation,
+            },
+          });
+        }
+      }
+    }
     if (step.name === '8_4') {
       await db.auditTrail.update({
         where: {
@@ -461,6 +516,7 @@ app
           include: {
             causes: true,
             actionPlan: true,
+            tests: true,
           },
         },
       },

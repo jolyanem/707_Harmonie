@@ -8,6 +8,7 @@ import type {
   Risk,
   Cause,
   ActionPlan,
+  Test,
 } from '@prisma/client';
 
 export type CategoryStepDto = Pick<CategoryStep, 'id' | 'name' | 'level'>;
@@ -32,6 +33,7 @@ export type AuditTrailDto = Pick<
 >;
 
 export type CauseDto = Pick<Cause, 'id' | 'probability' | 'type'>;
+export type TestDto = Pick<Test, 'id' | 'name' | 'documentation' | 'comments'>;
 
 export type ActionPlanDto = Pick<
   ActionPlan,
@@ -50,6 +52,7 @@ export type RiskDto = Pick<
 > & {
   causes: Array<CauseDto>;
   actionPlan: ActionPlanDto;
+  tests: Array<TestDto>;
 };
 
 export type URSShortDto = Pick<URS, 'id' | 'code' | 'type' | 'name'>;

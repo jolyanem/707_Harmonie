@@ -363,7 +363,7 @@ const Step6_7 = ({ ursId, step, readonly, setReadonly, risks }: Props) => {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button type="button" variant="destructive" size="sm">
-                      Supprimer une réponse fournisseur
+                      Supprimer un risque
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>

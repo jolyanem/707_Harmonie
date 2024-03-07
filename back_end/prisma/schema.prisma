@@ -99,11 +99,23 @@ model Risk {
 
   causes Cause[]
 
+  tests Test[]
+
   actionPlan   ActionPlan @relation(fields: [actionPlanId], references: [id])
   actionPlanId String     @unique
 
   URS   URS    @relation(fields: [URSId], references: [id])
   URSId String
+}
+
+model Test {
+  id            String @id @default(uuid())
+  name          String @db.Text
+  documentation String @db.Text
+  comments      String @db.Text
+
+  risk   Risk?   @relation(fields: [riskId], references: [id])
+  riskId String?
 }
 
 model Cause {
