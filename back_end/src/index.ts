@@ -14,6 +14,7 @@ import type {
   URSDto,
   URSPutDto,
   URSShortDto,
+  UserDto,
 } from './types';
 import { CategoryStep } from '@prisma/client';
 
@@ -598,6 +599,62 @@ app
       parents,
     } satisfies CategoryStepCompleteDto);
   });
+
+app
+  .get('/users', async(req, res) => {
+    console.log('[GET] Users');
+    const users = await db.user.findMany();
+    res.json(users);
+  })
+  .post('/users', async (req, res) => {
+    try {
+      const user = await db.user.create({
+        data: {
+          name: req.body.name,
+          surname: req.body.surname,
+          email: req.body.email,
+          employer_name: req.body.employer_name,
+          employer_phone: req.body.employer_phone,
+          role: req.body.role,
+          statut: req.body.statut,
+        },
+      });
+      res.json(user);
+    } catch (error) {
+      console.error('Error creating user:', error);
+      res.status(500).json({ error: 'Failed to create user' });
+    }
+    console.log('[POST] User :', req.body.id);
+  })
+  .put('/users/:userId', async (req, res) => {
+    const userId = parseInt(req.params.userId, 10);
+    try {
+        const { name, surname, email, employer_name, employer_phone, role, statut } = req.body;
+
+
+        const updatedUser = await db.user.update({
+            where: { id: userId },
+            data: {
+                name,
+                surname,
+                email,
+                employer_name,
+                employer_phone,
+                role,
+                statut,
+            },
+        });
+        res.json(updatedUser);
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ error: 'Failed to update user' });
+    }
+    console.log('[PUT] User ID:', userId);
+})
+
+
+  
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
