@@ -5,3 +5,9 @@
 body {
   font-family: 'Inter Variable', sans-serif;
 }
+
+.djs-overlay-context-pad,
+.djs-palette,
+.bjs-powered-by {
+  display: none;
+}

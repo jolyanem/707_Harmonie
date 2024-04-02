@@ -16,14 +16,13 @@ import ProjetsPage from '~/routes/projects';
 import UsersPage from '~/routes/users';
 import { Toaster } from 'sonner';
 import axios from 'axios';
-import URSListPage from '~/routes/projects/urs';
 import ProjectPage from '~/routes/projects/details';
 
 import type {
+  CategoryStepCompleteDto,
   ProjectDetailedDto,
   ProjectDto,
   URSDto,
-  URSShortDto,
 } from 'backend-types';
 
 import './index.css';
@@ -88,24 +87,14 @@ const projectDiagramRoute = createRoute({
 
 const stepRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/projects/$projectId/steps/$stepName',
+  path: '/projects/$projectId/steps/$stepId',
   loader: ({ params }) =>
     axios
-      .get<Array<URSShortDto>>(
-        `/projects/${params.projectId}/steps/${params.stepName}`
+      .get<CategoryStepCompleteDto>(
+        `/projects/${params.projectId}/steps/${params.stepId}`
       )
       .then((res) => res.data),
   component: StepPage,
-});
-
-const ursListeRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/projects/$projectId/urs',
-  loader: ({ params }) =>
-    axios
-      .get<Array<URSDto>>(`/projects/${params.projectId}/urs`)
-      .then((res) => res.data),
-  component: URSListPage,
 });
 
 const ursFicheRoute = createRoute({
@@ -123,7 +112,6 @@ const routeTree = rootRoute.addChildren([
   projectRoute,
   projectDiagramRoute,
   stepRoute,
-  ursListeRoute,
   ursFicheRoute,
 ]);
 

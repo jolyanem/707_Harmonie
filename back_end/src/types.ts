@@ -11,7 +11,19 @@ import type {
   Test,
 } from '@prisma/client';
 
-export type CategoryStepDto = Pick<CategoryStep, 'id' | 'name' | 'level'>;
+export type CategoryStepDto = Pick<CategoryStep, 'id' | 'name'> & {
+  parent?: CategoryStepDto | null;
+};
+
+export type CategoryStepCreateDto = Pick<CategoryStep, 'name' | 'projectId'> & {
+  parentId?: CategoryStep['id'];
+};
+
+export type CategoryStepCompleteDto = CategoryStep & {
+  children: Array<CategoryStepDto>;
+  URS: Array<URSShortDto>;
+  parents: Array<CategoryStepDto>;
+};
 
 export type StepDto = Pick<Step, 'name' | 'status' | 'updatedAt' | 'updatedBy'>;
 
@@ -69,7 +81,7 @@ export type URSDto = Pick<
   | 'criticalityClient'
   | 'criticalityVSI'
 > & {
-  categorySteps: Array<CategoryStepDto>;
+  categorySteps: CategoryStepDto[];
   steps: Array<StepDto>;
   supplierResponses: Array<SupplierResponsesDto>;
   auditTrail: AuditTrailDto;
@@ -80,7 +92,7 @@ export type URSCreateDto = Pick<
   URS,
   'code' | 'type' | 'name' | 'description' | 'processType'
 > & {
-  projectId: Project['id'];
+  categoryStepId: CategoryStep['id'];
 };
 
 export type URSPutDto = Pick<
@@ -90,14 +102,33 @@ export type URSPutDto = Pick<
   categorySteps: Array<{
     id: CategoryStep['id'];
     name: CategoryStep['name'];
-    level: CategoryStep['level'];
   }>;
 };
 
 export type ProjectDto = Pick<Project, 'id' | 'name' | 'client'>;
 
 export type ProjectDetailedDto = Pick<Project, 'id' | 'name' | 'client'> & {
-  categorySteps: Record<CategoryStep['name'], Array<CategoryStep>>;
+  categorySteps: Array<
+    CategoryStep & {
+      children: Array<
+        CategoryStep & {
+          children: Array<
+            CategoryStep & {
+              children: Array<
+                CategoryStep & {
+                  children: Array<
+                    CategoryStep & {
+                      children: Array<CategoryStepDto>;
+                    }
+                  >;
+                }
+              >;
+            }
+          >;
+        }
+      >;
+    }
+  >;
 };
 
 export type ProjectCreateDto = Pick<Project, 'name' | 'client'>;

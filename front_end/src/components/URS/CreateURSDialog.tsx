@@ -44,9 +44,10 @@ const createURSSchema = z.object({
 
 type Props = {
   projectId: string;
+  categoryStepId: string;
 };
 
-const CreateURSDialog = ({ projectId }: Props) => {
+const CreateURSDialog = ({ projectId, categoryStepId }: Props) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const createURSMutation = useMutation({
@@ -54,7 +55,7 @@ const CreateURSDialog = ({ projectId }: Props) => {
     mutationFn: (values: z.infer<typeof createURSSchema>) =>
       axios.post<URSDto>(`/urs`, {
         ...values,
-        projectId: parseInt(projectId),
+        categoryStepId,
       } satisfies URSCreateDto),
     onSuccess: (res) => {
       toast.success('URS créée avec succès');

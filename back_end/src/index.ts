@@ -2,10 +2,13 @@ import express from 'express';
 import cors from 'cors';
 import { db } from './db';
 import type {
+  CategoryStepCompleteDto,
+  CategoryStepDto,
   ProjectDetailedDto,
   ProjectDto,
   RiskDto,
   SupplierResponsesDto,
+  URSCreateDto,
   URSDto,
   URSPutDto,
   URSShortDto,
@@ -31,7 +34,11 @@ app
         id,
       },
       include: {
-        categorySteps: true,
+        categoryStep: {
+          include: {
+            parent: true,
+          },
+        },
         steps: {
           orderBy: {
             name: 'asc',
@@ -51,17 +58,19 @@ app
     if (!urs) {
       return res.status(404).json({ message: 'URS not found' });
     }
-    res.json(urs satisfies URSDto);
+    const categorySteps = await getCategoryStepParents(urs.categoryStep);
+    res.json({ ...urs, categorySteps } satisfies URSDto);
   })
   .post('/urs', async (req, res) => {
-    console.log('[POST] URS :', req.body.id);
+    const body = req.body as URSCreateDto;
+    console.log('[POST] URS');
     const urs = await db.uRS.create({
       data: {
-        code: req.body.code,
-        name: req.body.name,
-        type: req.body.type,
-        description: req.body.description,
-        processType: req.body.processType,
+        code: body.code,
+        name: body.name,
+        type: body.type,
+        description: body.description,
+        processType: body.processType,
         criticalityClient: 'na',
         criticalityVSI: 'na',
         steps: {
@@ -116,9 +125,9 @@ app
             },
           ],
         },
-        project: {
+        categoryStep: {
           connect: {
-            id: req.body.projectId,
+            id: body.categoryStepId,
           },
         },
         auditTrail: {
@@ -148,43 +157,6 @@ app
         processType: body.processType,
       },
     });
-    const oldSteps = await db.categoryStep.findMany({
-      where: {
-        URSId: urs.id,
-      },
-    });
-    const stepsToDelete = oldSteps.filter(
-      (oldStep) => !body.categorySteps.some((step) => step.id === oldStep.id)
-    );
-    for (const step of stepsToDelete) {
-      await db.categoryStep.delete({
-        where: {
-          id: step.id,
-        },
-      });
-    }
-    for (let index = 0; index < body.categorySteps.length; index++) {
-      const step = body.categorySteps[index]!;
-      await db.categoryStep.upsert({
-        where: {
-          id: step.id,
-        },
-        update: {
-          name: step.name,
-          level: index + 1,
-        },
-        create: {
-          id: step.id,
-          name: step.name,
-          level: index + 1,
-          URS: {
-            connect: {
-              id: urs.id,
-            },
-          },
-        },
-      });
-    }
     res.json(urs satisfies URSShortDto);
   })
   .put('/urs/:ursId/step/:stepName', async (req, res) => {
@@ -486,73 +458,91 @@ app
       return res.status(404).json({ message: 'Project not found' });
     }
     const categorySteps = await db.categoryStep.findMany({
-      where: {
-        URS: {
-          projectId: project.id,
-        },
-      },
-    });
-    const categoryStepsMap = categorySteps.reduce((acc, categoryStep) => {
-      if (!acc[categoryStep.name]) {
-        acc[categoryStep.name] = [];
-      }
-      acc[categoryStep.name]!.push(categoryStep);
-      return acc;
-    }, {} as Record<CategoryStep['name'], Array<CategoryStep>>);
-    res.json({
-      ...project,
-      categorySteps: categoryStepsMap,
-    } satisfies ProjectDetailedDto);
-  })
-  .get('/projects/:projectId/urs', async (req, res) => {
-    console.log('[GET] Project :', req.params.projectId, '> URS');
-    const projectId = req.params.projectId;
-    const urs = await db.uRS.findMany({
-      where: {
-        projectId: parseInt(projectId),
-      },
       include: {
-        categorySteps: true,
-        steps: {
-          orderBy: {
-            name: 'asc',
-          },
-        },
-        supplierResponses: true,
-        auditTrail: true,
-        risks: {
+        children: {
           include: {
-            causes: true,
-            actionPlan: true,
-            tests: true,
-          },
-        },
-      },
-    });
-    res.json(urs satisfies Array<URSDto>);
-  })
-  .get('/projects/:projectId/steps/:stepName', async (req, res) => {
-    console.log(
-      '[GET] Project :',
-      req.params.projectId,
-      '> Step :',
-      req.params.stepName
-    );
-    const projectId = req.params.projectId;
-    const stepName = req.params.stepName;
-    const urs = await db.uRS.findMany({
-      where: {
-        categorySteps: {
-          some: {
-            name: {
-              equals: stepName,
+            children: {
+              include: {
+                children: {
+                  include: {
+                    children: {
+                      include: {
+                        children: true,
+                      },
+                    },
+                  },
+                },
+              },
             },
           },
         },
-        projectId: parseInt(projectId),
+      },
+      where: {
+        projectId: project.id,
+        parentId: null,
       },
     });
-    res.json(urs satisfies Array<URSShortDto>);
+    res.json({
+      ...project,
+      categorySteps,
+    } satisfies ProjectDetailedDto);
+  });
+
+const getCategoryStepParents = async (parent?: CategoryStep | null) => {
+  let parents: CategoryStepDto[] = [];
+  let currentParent = parent;
+  while (currentParent) {
+    parents.unshift(currentParent);
+    if (!currentParent.parentId) {
+      break;
+    }
+    currentParent = await db.categoryStep.findUnique({
+      where: {
+        id: currentParent.parentId,
+      },
+    });
+  }
+  return parents;
+};
+
+app
+  .post('/projects/:projectId/step', async (req, res) => {
+    console.log('[POST] Category Step :', req.body.name);
+    const categoryStep = await db.categoryStep.create({
+      data: {
+        name: req.body.name,
+        projectId: parseInt(req.params.projectId),
+        parentId: req.body.parentId,
+      },
+    });
+    res.json(categoryStep);
+  })
+  .get('/projects/:projectId/steps/:categoryStepId', async (req, res) => {
+    console.log(
+      '[GET] Project :',
+      req.params.projectId,
+      '> Category Step :',
+      req.params.categoryStepId
+    );
+    const categoryStepId = req.params.categoryStepId;
+    const categoryStep = await db.categoryStep.findUnique({
+      where: {
+        id: categoryStepId,
+      },
+      include: {
+        URS: true,
+        children: true,
+        parent: true,
+      },
+    });
+    if (!categoryStep) {
+      return res.status(404).json({ message: 'Process Step not found' });
+    }
+    const parents = await getCategoryStepParents(categoryStep.parent);
+    res.json({
+      ...categoryStep,
+      parents,
+    } satisfies CategoryStepCompleteDto);
   });
 
 app.listen(port, () => {

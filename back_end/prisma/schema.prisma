@@ -18,23 +18,23 @@ model Project {
   name   String @db.Text
   client String @db.Text
 
-  URS URS[]
+  categorySteps CategoryStep[]
 }
 
 model URS {
-  id                String         @id @default(uuid())
-  code              String         @db.Text
-  name              String         @db.Text
-  type              String         @db.Text
-  description       String         @db.Text
-  processType       String         @db.Text
-  criticalityClient String         @db.Text
-  criticalityVSI    String         @db.Text
-  categorySteps     CategoryStep[]
-  steps             Step[]
+  id                String @id @default(uuid())
+  code              String @db.Text
+  name              String @db.Text
+  type              String @db.Text
+  description       String @db.Text
+  processType       String @db.Text
+  criticalityClient String @db.Text
+  criticalityVSI    String @db.Text
 
-  project   Project @relation(fields: [projectId], references: [id])
-  projectId Int
+  categoryStep   CategoryStep @relation(fields: [categoryStepId], references: [id])
+  categoryStepId String
+
+  steps Step[]
 
   supplierResponses SupplierResponse[]
 
@@ -45,12 +45,17 @@ model URS {
 }
 
 model CategoryStep {
-  id    String @id
-  name  String @db.Text
-  level Int
+  id   String @id @default(uuid())
+  name String @db.Text
 
-  URS   URS?    @relation(fields: [URSId], references: [id])
-  URSId String?
+  children CategoryStep[] @relation("ParentCategoryStep")
+  parent   CategoryStep?  @relation("ParentCategoryStep", fields: [parentId], references: [id])
+  parentId String?
+
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId Int
+
+  URS URS[]
 }
 
 model Step {
