@@ -105,19 +105,24 @@ export type URSPutDto = Pick<
   }>;
 };
 
-export type ProjectDto = Pick<Project, 'id' | 'name' | 'client'>;
+export type ProjectDto = Pick<Project, 'id' | 'name' | 'client' | 'createdAt'>;
 
 export type ProjectDetailedDto = Pick<Project, 'id' | 'name' | 'client'> & {
   categorySteps: Array<
     CategoryStep & {
+      URS: Array<URSShortDto>;
       children: Array<
         CategoryStep & {
+          URS: Array<URSShortDto>;
           children: Array<
             CategoryStep & {
+              URS: Array<URSShortDto>;
               children: Array<
                 CategoryStep & {
+                  URS: Array<URSShortDto>;
                   children: Array<
                     CategoryStep & {
+                      URS: Array<URSShortDto>;
                       children: Array<CategoryStepDto>;
                     }
                   >;

@@ -39,6 +39,36 @@ const ProjectDiagramPage = () => {
         return;
       }
 
+      const renderURS = (
+        xStart: number,
+        y: number,
+        step: (typeof project.categorySteps)[0],
+        parentId: string
+      ) => {
+        const parent = elementRegistry.get(parentId) as Element | undefined;
+        if (!parent) {
+          return;
+        }
+        let x = xStart;
+        for (const urs of step.URS) {
+          const taskBusinessObject = bpmnFactory.create('bpmn:ServiceTask', {
+            id: urs.id,
+            name: urs.name,
+          });
+
+          const task = elementFactory.createShape({
+            type: 'bpmn:ServiceTask',
+            businessObject: taskBusinessObject,
+          });
+
+          modeling.createShape(task, { x, y }, proc);
+
+          modeling.connect(parent, task);
+
+          x += 130;
+        }
+      };
+
       const renderCategoryStepChildren = (
         yStart: number,
         step: (typeof project.categorySteps)[0],
@@ -61,9 +91,10 @@ const ProjectDiagramPage = () => {
 
           modeling.createShape(task, { x: 218, y: yStart }, proc);
 
-          modeling.connect(parent, task);
+          modeling.connect(parent, task, undefined);
 
           renderCategoryStepChildren(yStart + 110, child, child.id);
+          renderURS(400, yStart, child, child.id);
         }
       };
 
@@ -83,16 +114,23 @@ const ProjectDiagramPage = () => {
 
         modeling.connect(startEvent, task);
 
+        renderURS(x + 200, 200, step, step.id);
         renderCategoryStepChildren(300, step, step.id);
 
-        x += 130;
+        x += 400;
       }
 
-      // v.saveXML().then((xml) => {
-      //   layoutProcess(xml.xml).then((layoutedXml) => {
-      //     v.importXML(layoutedXml);
+      // modeler
+      //   .saveXML({
+      //     format: true,
+      //     preamble: false,
+      //   })
+      //   .then((xml) => {
+      //     console.log(xml.xml);
+      //     layoutProcess(xml.xml).then((layoutedXml) => {
+      //       modeler.importXML(layoutedXml);
+      //     });
       //   });
-      // });
 
       const canvas = modeler.get<Canvas>('canvas');
       canvas.zoom('fit-viewport');
@@ -100,13 +138,18 @@ const ProjectDiagramPage = () => {
       const eventBus = modeler.get<EventBus>('eventBus');
 
       eventBus.on('element.click', (e) => {
-        console.log(e);
         const element = e.element;
         if (element.type === 'bpmn:Task') {
           console.log('Task clicked');
           navigate({
             to: '/projects/$projectId/steps/$stepId',
             params: { projectId: project.id.toString(), stepId: element.id },
+          });
+        } else if (element.type === 'bpmn:ServiceTask') {
+          console.log('ServiceTask clicked');
+          navigate({
+            to: '/projects/$projectId/urs/$id',
+            params: { projectId: project.id.toString(), id: element.id },
           });
         }
       });

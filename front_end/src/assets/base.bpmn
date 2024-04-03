@@ -4,7 +4,7 @@
   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="Definitions_1"
   targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.1.0"
-  xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL\ BPMN20.xsd">
   <bpmn2:process id="Process" isExecutable="false">
     <bpmn2:startEvent id="Start" name="Start" />
   </bpmn2:process>

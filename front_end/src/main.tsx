@@ -29,6 +29,7 @@ import './index.css';
 import '@fontsource-variable/inter';
 import StepPage from '~/routes/projects/steps/details';
 import ProjectDiagramPage from '~/routes/projects/diagram';
+import DatabasePage from '~/routes/database';
 
 const queryClient = new QueryClient();
 
@@ -105,6 +106,14 @@ const ursFicheRoute = createRoute({
   component: URSFichePage,
 });
 
+const databaseRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/database',
+  loader: () =>
+    axios.get<Array<ProjectDto>>('/projects').then((res) => res.data),
+  component: DatabasePage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   usersRoute,
@@ -113,6 +122,7 @@ const routeTree = rootRoute.addChildren([
   projectDiagramRoute,
   stepRoute,
   ursFicheRoute,
+  databaseRoute,
 ]);
 
 const router = createRouter({ routeTree });

@@ -14,9 +14,10 @@ datasource db {
 }
 
 model Project {
-  id     Int    @id @default(autoincrement())
-  name   String @db.Text
-  client String @db.Text
+  id        Int      @id @default(autoincrement())
+  name      String   @db.Text
+  client    String   @db.Text
+  createdAt DateTime @default(now())
 
   categorySteps CategoryStep[]
 }

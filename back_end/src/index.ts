@@ -459,14 +459,19 @@ app
     }
     const categorySteps = await db.categoryStep.findMany({
       include: {
+        URS: true,
         children: {
           include: {
+            URS: true,
             children: {
               include: {
+                URS: true,
                 children: {
                   include: {
+                    URS: true,
                     children: {
                       include: {
+                        URS: true,
                         children: true,
                       },
                     },

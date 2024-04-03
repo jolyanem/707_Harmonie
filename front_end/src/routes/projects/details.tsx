@@ -1,11 +1,6 @@
 import { Link, useLoaderData } from '@tanstack/react-router';
+import LinkToDiagram from '~/components/LinkToDiagram';
 import CreateCategoryStepDialog from '~/components/categorySteps/CreateCategoryStepDialog';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-} from '~/components/ui/breadcrumb';
 
 const ProjectPage = () => {
   const project = useLoaderData({
@@ -13,19 +8,16 @@ const ProjectPage = () => {
   });
   return (
     <div>
-      {/* <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbPage>{project.name}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb> */}
       <header className="flex items-center justify-between">
         <h1 className="font-bold text-2xl">{project.name}</h1>
-        <CreateCategoryStepDialog projectId={project.id} />
+        <LinkToDiagram projectId={project.id.toString()} />
       </header>
       <section className="mt-4">
-        <div className="grid grid-cols-4 bg-white rounded-lg px-4 py-2 text-[#284E91] font-semibold">
+        <h2 className="text-xl flex items-center justify-between font-medium">
+          <span>Process steps</span>
+          <CreateCategoryStepDialog projectId={project.id} />
+        </h2>
+        <div className="grid grid-cols-4 bg-white rounded-lg px-4 py-2 text-[#284E91] font-semibold mt-2">
           <div className="col-span-3">Nom</div>
           {/* <div className="text-center">Nombre d'URS</div> */}
         </div>
@@ -41,7 +33,7 @@ const ProjectPage = () => {
           >
             <div className="col-span-3">{categoryStep.name}</div>
             {/* <div className="text-center">
-              {project.categorySteps.find((step) => step.id === stepId)?.}
+              TODO 
             </div> */}
           </Link>
         ))}

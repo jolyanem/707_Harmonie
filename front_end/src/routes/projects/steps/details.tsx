@@ -1,5 +1,6 @@
 import { Link, useLoaderData, useParams } from '@tanstack/react-router';
 import React from 'react';
+import LinkToDiagram from '~/components/LinkToDiagram';
 import CreateURSDialog from '~/components/URS/CreateURSDialog';
 import CreateCategoryStepDialog from '~/components/categorySteps/CreateCategoryStepDialog';
 import {
@@ -21,44 +22,47 @@ const StepPage = () => {
   });
   return (
     <>
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link
-                to="/projects/$projectId"
-                params={{
-                  projectId: projectId,
-                }}
-              >
-                Projet
-              </Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          {categoryStep.parents.map((parent) => (
-            <React.Fragment key={parent.id}>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link
-                    to="/projects/$projectId/steps/$stepId"
-                    params={{
-                      projectId: projectId,
-                      stepId: parent.id,
-                    }}
-                  >
-                    {parent.name}
-                  </Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </React.Fragment>
-          ))}
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{categoryStep.name}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <header className="flex justify-between items-center">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link
+                  to="/projects/$projectId"
+                  params={{
+                    projectId: projectId,
+                  }}
+                >
+                  Projet
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            {categoryStep.parents.map((parent) => (
+              <React.Fragment key={parent.id}>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link
+                      to="/projects/$projectId/steps/$stepId"
+                      params={{
+                        projectId: projectId,
+                        stepId: parent.id,
+                      }}
+                    >
+                      {parent.name}
+                    </Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              </React.Fragment>
+            ))}
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{categoryStep.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <LinkToDiagram projectId={projectId} />
+      </header>
       <h1 className="font-bold text-2xl mt-4">{categoryStep.name}</h1>
       <section className="mt-4">
         <h2 className="text-xl flex items-center justify-between font-medium">

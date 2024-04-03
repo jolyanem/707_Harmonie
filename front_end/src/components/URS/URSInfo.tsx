@@ -35,6 +35,7 @@ import {
   BreadcrumbSeparator,
 } from '~/components/ui/breadcrumb';
 import { Link, useParams } from '@tanstack/react-router';
+import LinkToDiagram from '~/components/LinkToDiagram';
 
 type Props = {
   urs: Pick<
@@ -97,44 +98,47 @@ const URSInfo = ({ urs }: Props) => {
 
   return (
     <div>
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link
-                to="/projects/$projectId"
-                params={{
-                  projectId: projectId,
-                }}
-              >
-                Projet
-              </Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          {urs.categorySteps.map((categoryStep) => (
-            <React.Fragment key={categoryStep.id}>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link
-                    to="/projects/$projectId/steps/$stepId"
-                    params={{
-                      projectId: projectId,
-                      stepId: categoryStep.id,
-                    }}
-                  >
-                    {categoryStep.name}
-                  </Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </React.Fragment>
-          ))}
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{urs.code}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <header className="flex justify-between">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link
+                  to="/projects/$projectId"
+                  params={{
+                    projectId: projectId,
+                  }}
+                >
+                  Projet
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            {urs.categorySteps.map((categoryStep) => (
+              <React.Fragment key={categoryStep.id}>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link
+                      to="/projects/$projectId/steps/$stepId"
+                      params={{
+                        projectId: projectId,
+                        stepId: categoryStep.id,
+                      }}
+                    >
+                      {categoryStep.name}
+                    </Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              </React.Fragment>
+            ))}
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{urs.code}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <LinkToDiagram projectId={projectId} />
+      </header>
       <h1 className="font-bold text-2xl mt-4">
         <span className="text-gray-500">FICHE URS | </span>
         <span>{urs.code}</span>
