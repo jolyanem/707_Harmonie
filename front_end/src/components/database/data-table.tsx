@@ -2,7 +2,6 @@
 
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
   flexRender,
   getCoreRowModel,
@@ -10,6 +9,7 @@ import {
   useReactTable,
   getSortedRowModel,
   getPaginationRowModel,
+  RowData,
 } from '@tanstack/react-table';
 import { useState } from 'react';
 
@@ -22,90 +22,70 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Input } from '~/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
 import { DataTablePagination } from '~/components/database/pagination';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
+  defaultColumn: Partial<ColumnDef<TData>>;
   data: TData[];
-  filterableColumns?: Array<Array<ColumnDef<TData, TValue>>[number]['id']>;
+  onRowUpdated?: (value: TData) => void;
+}
+
+declare module '@tanstack/react-table' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface TableMeta<TData extends RowData> {
+    updateData: (rowIndex: number, columnId: string, value: unknown) => void;
+  }
 }
 
 export function DataTable<TData, TValue>({
   columns,
+  defaultColumn,
   data,
-  filterableColumns = [],
+  onRowUpdated,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [currentColumnToFilter, setCurrentColumnToFilter] = useState<string>(
-    columns.filter(
-      (column) => column.id && filterableColumns.includes(column.id ?? '')
-    )[0].id as string
-  );
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState('');
 
   const table = useReactTable({
     data,
     columns,
+    defaultColumn,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       sorting,
-      columnFilters,
+      globalFilter,
+    },
+    meta: {
+      updateData: (rowIndex, columnId, value) => {
+        if (!onRowUpdated) {
+          return;
+        }
+        const oldData = data.find((_row, index) => index === rowIndex);
+        if (oldData) {
+          onRowUpdated({ ...oldData, [columnId]: value });
+        }
+      },
     },
   });
 
   return (
     <div>
-      {filterableColumns.length > 0 && (
-        <div className="flex items-center py-4 gap-2">
-          <Select
-            onValueChange={(value) => setCurrentColumnToFilter(value as string)}
-            defaultValue={currentColumnToFilter}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filtrer" />
-            </SelectTrigger>
-            <SelectContent>
-              {columns
-                .filter((column) => filterableColumns.includes(column.id ?? ''))
-                .map((column) => (
-                  <SelectItem
-                    key={column.id}
-                    value={column.id as string}
-                    className="capitalize"
-                  >
-                    {column.id}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
-          <Input
-            placeholder="Rechercher..."
-            value={
-              (table
-                .getColumn(currentColumnToFilter)
-                ?.getFilterValue() as string) ?? ''
-            }
-            onChange={(event) =>
-              table
-                .getColumn(currentColumnToFilter)
-                ?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
-        </div>
-      )}
+      <div className="flex items-center py-4 gap-2">
+        <Input
+          placeholder="Rechercher..."
+          value={globalFilter}
+          onChange={(event) =>
+            setGlobalFilter(event.target.value.toLowerCase())
+          }
+          className="max-w-sm"
+        />
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>

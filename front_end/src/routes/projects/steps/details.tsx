@@ -66,7 +66,7 @@ const StepPage = () => {
       <h1 className="font-bold text-2xl mt-4">{categoryStep.name}</h1>
       <section className="mt-4">
         <h2 className="text-xl flex items-center justify-between font-medium">
-          <span>Process steps</span>
+          <span>Process steps level {categoryStep.parents.length + 2}</span>
           <CreateCategoryStepDialog
             projectId={parseInt(projectId)}
             parentId={categoryStep.id}

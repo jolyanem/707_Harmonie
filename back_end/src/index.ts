@@ -4,8 +4,10 @@ import { db } from './db';
 import type {
   CategoryStepCompleteDto,
   CategoryStepDto,
+  ProjectDetailDatabaseDto,
   ProjectDetailedDto,
   ProjectDto,
+  ProjectPatchDto,
   RiskDto,
   SupplierResponsesDto,
   URSCreateDto,
@@ -431,6 +433,39 @@ app
     res.json(step);
   });
 
+app.get('/database/projects/:id', async (req, res) => {
+  console.log('[GET] Database Project :', req.params.id);
+  const project = await db.project.findUnique({
+    where: {
+      id: parseInt(req.params.id),
+    },
+    include: {
+      categorySteps: {
+        include: {
+          _count: {
+            select: {
+              URS: true,
+              children: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  if (!project) {
+    return res.status(404).json({ message: 'Project not found' });
+  }
+  res.json({
+    ...project,
+    categorySteps:
+      project?.categorySteps.map((categoryStep) => ({
+        ...categoryStep,
+        URSCount: categoryStep._count.URS,
+        childrenCount: categoryStep._count.children,
+      })) ?? [],
+  } satisfies ProjectDetailDatabaseDto);
+});
+
 app
   .get('/projects', async (req, res) => {
     console.log('[GET] Projects');
@@ -443,6 +478,20 @@ app
       data: {
         name: req.body.name,
         client: req.body.client,
+      },
+    });
+    res.json(project satisfies ProjectDto);
+  })
+  .patch('/projects/:id', async (req, res) => {
+    console.log('[PATCH] Project :', req.params.id);
+    const body = req.body as ProjectPatchDto;
+    const project = await db.project.update({
+      where: {
+        id: parseInt(req.params.id),
+      },
+      data: {
+        name: body.name,
+        client: body.client,
       },
     });
     res.json(project satisfies ProjectDto);

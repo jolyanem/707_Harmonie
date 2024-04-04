@@ -14,7 +14,7 @@ const ProjectPage = () => {
       </header>
       <section className="mt-4">
         <h2 className="text-xl flex items-center justify-between font-medium">
-          <span>Process steps</span>
+          <span>Process steps level 1</span>
           <CreateCategoryStepDialog projectId={project.id} />
         </h2>
         <div className="grid grid-cols-4 bg-white rounded-lg px-4 py-2 text-[#284E91] font-semibold mt-2">

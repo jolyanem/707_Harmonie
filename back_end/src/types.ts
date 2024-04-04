@@ -107,6 +107,20 @@ export type URSPutDto = Pick<
 
 export type ProjectDto = Pick<Project, 'id' | 'name' | 'client' | 'createdAt'>;
 
+export type ProjectDetailDatabaseDto = Pick<
+  Project,
+  'id' | 'name' | 'client'
+> & {
+  categorySteps: Array<
+    Pick<CategoryStep, 'id' | 'name'> & {
+      URSCount: number;
+      childrenCount: number;
+    }
+  >;
+};
+
+export type ProjectPatchDto = Pick<Project, 'name' | 'client'>;
+
 export type ProjectDetailedDto = Pick<Project, 'id' | 'name' | 'client'> & {
   categorySteps: Array<
     CategoryStep & {

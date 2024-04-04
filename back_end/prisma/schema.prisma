@@ -65,7 +65,7 @@ model Step {
   updatedAt DateTime?
   updatedBy String?   @db.Text
 
-  URS   URS    @relation(fields: [URSId], references: [id])
+  URS   URS    @relation(fields: [URSId], references: [id], onDelete: Cascade)
   URSId String
 
   @@id([URSId, name])

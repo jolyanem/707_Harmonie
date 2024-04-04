@@ -20,6 +20,7 @@ import ProjectPage from '~/routes/projects/details';
 
 import type {
   CategoryStepCompleteDto,
+  ProjectDetailDatabaseDto,
   ProjectDetailedDto,
   ProjectDto,
   URSDto,
@@ -30,6 +31,7 @@ import '@fontsource-variable/inter';
 import StepPage from '~/routes/projects/steps/details';
 import ProjectDiagramPage from '~/routes/projects/diagram';
 import DatabasePage from '~/routes/database';
+import DatabaseProjectDetailsPage from '~/routes/database/project';
 
 const queryClient = new QueryClient();
 
@@ -114,6 +116,16 @@ const databaseRoute = createRoute({
   component: DatabasePage,
 });
 
+const databaseProjectDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/database/projects/$projectId',
+  loader: ({ params }) =>
+    axios
+      .get<ProjectDetailDatabaseDto>(`/database/projects/${params.projectId}`)
+      .then((res) => res.data),
+  component: DatabaseProjectDetailsPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   usersRoute,
@@ -123,6 +135,7 @@ const routeTree = rootRoute.addChildren([
   stepRoute,
   ursFicheRoute,
   databaseRoute,
+  databaseProjectDetailRoute,
 ]);
 
 const router = createRouter({ routeTree });
