@@ -163,5 +163,6 @@ model User {
   employer_phone String @db.Text
   role Role 
   statut Statut 
+  password String @db.Text
 }
 

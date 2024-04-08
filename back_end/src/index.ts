@@ -599,13 +599,15 @@ app
       parents,
     } satisfies CategoryStepCompleteDto);
   });
-
+// create, modify, get users 
 app
   .get('/users', async(req, res) => {
     console.log('[GET] Users');
     const users = await db.user.findMany();
-    res.json(users);
+    res.json(users satisfies Array<UserDto>);
+    console.log(typeof users);
   })
+  
   .post('/users', async (req, res) => {
     try {
       const user = await db.user.create({
@@ -617,6 +619,7 @@ app
           employer_phone: req.body.employer_phone,
           role: req.body.role,
           statut: req.body.statut,
+          password : req.body.password,
         },
       });
       res.json(user);
@@ -626,11 +629,11 @@ app
     }
     console.log('[POST] User :', req.body.id);
   })
+
   .put('/users/:userId', async (req, res) => {
     const userId = parseInt(req.params.userId, 10);
     try {
-        const { name, surname, email, employer_name, employer_phone, role, statut } = req.body;
-
+        const { name, surname, email, employer_name, employer_phone, role, statut, password } = req.body;
 
         const updatedUser = await db.user.update({
             where: { id: userId },
@@ -642,6 +645,7 @@ app
                 employer_phone,
                 role,
                 statut,
+                password,
             },
         });
         res.json(updatedUser);
@@ -651,6 +655,53 @@ app
     }
     console.log('[PUT] User ID:', userId);
 })
+
+const jwt = require('jsonwebtoken');
+
+
+app.post("/auth/login", async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await db.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
+    
+
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        success: false,
+        message: "This user doesn't exist.",
+      });
+    }
+    /* const isPasswordMatched = (password === user.password);
+    if (!isPasswordMatched) {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "Incorrect password.",
+      });
+    } */
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role : user.role, statut : user.statut },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      message: "Token généré avec succès.",
+      token: token,
+    });
+  } catch (error) {
+    console.error("Error during the token generation :", error);
+    // Gérer l'erreur
+  }
+});
 
 
   
