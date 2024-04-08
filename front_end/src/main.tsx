@@ -24,6 +24,7 @@ import type {
   ProjectDetailedDto,
   ProjectDto,
   URSDto,
+  UserDto
 } from 'backend-types';
 
 import './index.css';
@@ -57,6 +58,8 @@ const indexRoute = createRoute({
 const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/users',
+  loader: () =>
+  axios.get<Array<UserDto>>('/users').then((res) => res.data),
   component: UsersPage,
 });
 

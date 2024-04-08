@@ -10,7 +10,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import type { ProjectCreateDto, ProjectDto } from 'backend-types';
+import type { UserDto } from 'backend-types';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -31,18 +31,18 @@ const createProjectSchema = z.object({
   client: z.string().min(2).max(50),
 });
 
-const CreateProjectDialog = () => {
-  const navigate = useNavigate();
+const CreateUserDialog = () => {
+/*   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const createProjectMutation = useMutation({
     mutationKey: ['createProject'],
     mutationFn: (values: z.infer<typeof createProjectSchema>) =>
-      axios.post<ProjectDto>(`/projects`, values satisfies ProjectCreateDto),
+      axios.post<UserDto>(`/users`),
     onSuccess: (res) => {
-      toast.success('Project créé avec succès');
+      toast.success('Utilisateur créé avec succès');
       setOpen(false);
       navigate({
-        to: `/projects/$projectId`,
+        to: `/users/$projectId`,
         params: {
           projectId: res.data.id.toString(),
         },
@@ -67,12 +67,12 @@ const CreateProjectDialog = () => {
       <DialogTrigger asChild>
         <Button variant="secondary" className="gap-2">
           <PlusIcon size={20} />
-          Nouveau Projet
+          Nouvel utilisateur
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Créer un nouveau projet</DialogTitle>
+          <DialogTitle>Créer un nouvel utilisateur</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
@@ -81,7 +81,7 @@ const CreateProjectDialog = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Prénom</FormLabel>
+                  <FormLabel>Nom du projet</FormLabel>
                   <FormControl>
                     <Input placeholder="" {...field} />
                   </FormControl>
@@ -94,7 +94,7 @@ const CreateProjectDialog = () => {
               name="client"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nom</FormLabel>
+                  <FormLabel>Client du projet</FormLabel>
                   <FormControl>
                     <Input placeholder="" {...field} />
                   </FormControl>
@@ -109,7 +109,8 @@ const CreateProjectDialog = () => {
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  ); */
+
 };
 
-export default CreateProjectDialog;
+export default CreateUserDialog;
