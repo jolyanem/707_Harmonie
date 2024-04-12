@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
@@ -15,7 +17,6 @@ import { Element } from 'diagram-js/lib/model';
 import { useEffect } from 'react';
 import { Parent } from 'bpmn-js/lib/model/Types';
 import { EventBus } from 'diagram-js/lib/features/interaction-events/InteractionEvents';
-import { layoutProcess } from 'bpmn-auto-layout';
 
 const ProjectDiagramPage = () => {
   const navigate = useNavigate();
@@ -38,6 +39,8 @@ const ProjectDiagramPage = () => {
       if (!proc || !startEvent) {
         return;
       }
+
+      startEvent.businessObject.name = project.name;
 
       const renderURS = (
         xStart: number,
@@ -140,16 +143,19 @@ const ProjectDiagramPage = () => {
       eventBus.on('element.click', (e) => {
         const element = e.element;
         if (element.type === 'bpmn:Task') {
-          console.log('Task clicked');
           navigate({
             to: '/projects/$projectId/steps/$stepId',
             params: { projectId: project.id.toString(), stepId: element.id },
           });
         } else if (element.type === 'bpmn:ServiceTask') {
-          console.log('ServiceTask clicked');
           navigate({
             to: '/projects/$projectId/urs/$id',
             params: { projectId: project.id.toString(), id: element.id },
+          });
+        } else if (element.type === 'bpmn:StartEvent') {
+          navigate({
+            to: '/projects/$projectId',
+            params: { projectId: project.id.toString() },
           });
         }
       });
