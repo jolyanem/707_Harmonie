@@ -3,8 +3,6 @@ name: '[Backend] Docker'
 on:
   push:
     branches: ['main']
-    paths:
-      - 'back_end/**'
 
 env:
   REGISTRY: ghcr.io
