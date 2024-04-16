@@ -5,7 +5,6 @@ const ProjectsPage = () => {
   const projects = useLoaderData({
     from: '/projects',
   });
-
   return (
     <div>
       <div className="flex justify-end">
@@ -17,7 +16,7 @@ const ProjectsPage = () => {
           <div className="col-span-3">Titre du projet</div>
           <div className="col-span-2">Entreprise client</div>
         </div>
-        {projects.map((project) => (
+        {projects && Array.isArray(projects) && projects.map((project) => (
           <Link
             key={project.id}
             to="/projects/$projectId"
