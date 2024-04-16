@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "707_Harmonie",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

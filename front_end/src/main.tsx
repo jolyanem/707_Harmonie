@@ -5,7 +5,7 @@ import {
   RouterProvider,
   createRouter,
   createRoute,
-  createRootRoute,
+  createRootRouteWithContext,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -24,7 +24,7 @@ import type {
   ProjectDetailedDto,
   ProjectDto,
   URSDto,
-  UserDto
+  UserDto,
 } from 'backend-types';
 
 import './index.css';
@@ -33,6 +33,9 @@ import StepPage from '~/routes/projects/steps/details';
 import ProjectDiagramPage from '~/routes/projects/diagram';
 import DatabasePage from '~/routes/database';
 import DatabaseProjectDetailsPage from '~/routes/database/project';
+import { AuthContext, AuthProvider, useAuth } from '~/components/auth';
+import AuthCallback from '~/routes/auth/callback';
+import LoginPage from '~/routes/auth/login';
 
 const queryClient = new QueryClient();
 
@@ -40,7 +43,11 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 axios.defaults.baseURL = API_URL;
 
-const rootRoute = createRootRoute({
+interface RouterContext {
+  auth: AuthContext;
+}
+
+const rootRoute = createRootRouteWithContext<RouterContext>()({
   component: () => (
     <Layout>
       <Outlet />
@@ -58,14 +65,25 @@ const indexRoute = createRoute({
 const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/users',
-  loader: () =>
-  axios.get<Array<UserDto>>('/users').then((res) => res.data),
+  loader: () => axios.get<Array<UserDto>>('/users').then((res) => res.data),
   component: UsersPage,
 });
 
 const projectsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/projects',
+  beforeLoad: ({ context, location }) => {
+    console.log(location.href);
+    console.log(context);
+    // if (!context.auth.isAuthenticated) {
+    //   throw redirect({
+    //     to: '/login',
+    //     search: {
+    //       redirect: location.href,
+    //     },
+    //   });
+    // }
+  },
   loader: () =>
     axios.get<Array<ProjectDto>>('/projects').then((res) => res.data),
   component: ProjetsPage,
@@ -129,6 +147,18 @@ const databaseProjectDetailRoute = createRoute({
   component: DatabaseProjectDetailsPage,
 });
 
+const loginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/login',
+  component: LoginPage,
+});
+
+const authCallbackRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/auth/callback',
+  component: AuthCallback,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   usersRoute,
@@ -139,9 +169,16 @@ const routeTree = rootRoute.addChildren([
   ursFicheRoute,
   databaseRoute,
   databaseProjectDetailRoute,
+  authCallbackRoute,
+  loginRoute,
 ]);
 
-const router = createRouter({ routeTree });
+const router = createRouter({
+  routeTree,
+  context: {
+    auth: undefined!,
+  },
+});
 
 declare module '@tanstack/react-router' {
   interface Register {
@@ -149,15 +186,30 @@ declare module '@tanstack/react-router' {
   }
 }
 
+function InnerApp() {
+  const auth = useAuth();
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} context={{ auth }} />
+      <Toaster />
+    </QueryClientProvider>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <InnerApp />
+    </AuthProvider>
+  );
+}
+
 const rootElement = document.getElementById('root')!;
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-        <Toaster />
-      </QueryClientProvider>
+      <App />
     </StrictMode>
   );
 }

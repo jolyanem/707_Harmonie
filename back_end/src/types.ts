@@ -10,8 +10,7 @@ import type {
   ActionPlan,
   Test,
   User,
-  Role, 
-  Statut,
+  Role,
 } from '@prisma/client';
 
 export type CategoryStepDto = Pick<CategoryStep, 'id' | 'name'> & {
@@ -155,9 +154,16 @@ export type ProjectDetailedDto = Pick<Project, 'id' | 'name' | 'client'> & {
 
 export type ProjectCreateDto = Pick<Project, 'name' | 'client'>;
 
-export type UserDto = Pick<User, 
-  'id' | 'name' | 'surname' | 'email' | 'employer_name' | 'employer_phone'
-> & {
-  role: Role;
-  statut: Statut;
-};
+export type UserDto = Pick<
+  User,
+  | 'id'
+  | 'name'
+  | 'surname'
+  | 'email'
+  | 'employerName'
+  | 'employerPhone'
+  | 'role'
+  | 'statut'
+>;
+
+export type UserRole = Role;

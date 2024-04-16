@@ -21,6 +21,7 @@ services:
     container_name: harmonie_backend
     environment:
       DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
     networks:
       - homelab
     labels:

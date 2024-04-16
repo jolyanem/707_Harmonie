@@ -145,24 +145,22 @@ model ActionPlan {
 }
 
 enum Role {
-  Client 
+  Client
   Collaborateur
 }
 
 enum Statut {
-  Actif 
+  Actif
   Inactif
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  name String @db.Text
-  surname String @db.Text
-  email String @db.Text
-  employer_name String @db.Text
-  employer_phone String @db.Text
-  role Role 
-  statut Statut 
-  password String @db.Text
+  id            String @id @default(cuid())
+  name          String @db.Text
+  surname       String @db.Text
+  email         String @unique @db.Text
+  employerName  String @db.Text
+  employerPhone String @db.Text
+  role          Role
+  statut        Statut
 }
-

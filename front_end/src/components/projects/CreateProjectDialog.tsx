@@ -81,7 +81,7 @@ const CreateProjectDialog = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Prénom</FormLabel>
+                  <FormLabel>Nom du projet</FormLabel>
                   <FormControl>
                     <Input placeholder="" {...field} />
                   </FormControl>
@@ -94,7 +94,7 @@ const CreateProjectDialog = () => {
               name="client"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nom</FormLabel>
+                  <FormLabel>Client</FormLabel>
                   <FormControl>
                     <Input placeholder="" {...field} />
                   </FormControl>
