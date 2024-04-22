@@ -6,17 +6,21 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
 
 import diagram from '~/assets/base.bpmn?raw';
 
-import { useLoaderData, useNavigate } from '@tanstack/react-router';
-import BpmnModeler from 'bpmn-js/lib/Modeler';
+import { useEffect } from 'react';
+import {
+  createLazyRoute,
+  useLoaderData,
+  useNavigate,
+} from '@tanstack/react-router';
+import Canvas from 'diagram-js/lib/core/Canvas';
 import ElementRegistry from 'diagram-js/lib/core/ElementRegistry';
 import ElementFactory from 'diagram-js/lib/core/ElementFactory';
+import type { Element } from 'diagram-js/lib/model';
 import Modeling from 'diagram-js/lib/features/modeling/Modeling';
-import BpmnFactory from 'bpmn-js/lib/features/modeling/BpmnFactory';
-import Canvas from 'diagram-js/lib/core/Canvas';
-import { Element } from 'diagram-js/lib/model';
-import { useEffect } from 'react';
-import { Parent } from 'bpmn-js/lib/model/Types';
 import { EventBus } from 'diagram-js/lib/features/interaction-events/InteractionEvents';
+import BpmnModeler from 'bpmn-js/lib/Modeler';
+import BpmnFactory from 'bpmn-js/lib/features/modeling/BpmnFactory';
+import { Parent } from 'bpmn-js/lib/model/Types';
 
 const ProjectDiagramPage = () => {
   const navigate = useNavigate();
@@ -175,4 +179,8 @@ const ProjectDiagramPage = () => {
   );
 };
 
-export default ProjectDiagramPage;
+export const ProjectDiagramPageRoute = createLazyRoute(
+  '/projects/$projectId/diagram'
+)({
+  component: ProjectDiagramPage,
+});

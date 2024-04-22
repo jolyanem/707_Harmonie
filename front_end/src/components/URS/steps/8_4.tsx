@@ -69,140 +69,107 @@ const Step8_4 = ({ ursId, step, readonly, setReadonly, auditTrail }: Props) => {
   }
 
   return (
-    <div>
-      <h2 className="font-semibold text-lg uppercase">
-        ÉTAPE 8.4 | Vérifications Opérationnelles (VO)
-      </h2>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-2 bg-white rounded-lg p-4 gap-4 mt-2"
-        >
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem className="col-span-2 max-w-[30ch]">
-                <FormLabel>Status d'avancement</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  disabled={field.disabled}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="na">Sans objet</SelectItem>
-                    <SelectItem value="todo">A réaliser</SelectItem>
-                    <SelectItem value="in_progress">En cours</SelectItem>
-                    <SelectItem value="finished">Terminé</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="auditTrail.consultation"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Consultation de l’Audit Trail</FormLabel>
-                <Select
-                  onValueChange={(value) => field.onChange(value === 'true')}
-                  defaultValue={field.value ? 'true' : 'false'}
-                  disabled={field.disabled}
-                  value={field.value ? 'true' : 'false'}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="false">Non</SelectItem>
-                    <SelectItem value="true">Oui</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="auditTrail.revue"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Revue de l’Audit Trail</FormLabel>
-                <Select
-                  onValueChange={(value) => field.onChange(value === 'true')}
-                  defaultValue={field.value ? 'true' : 'false'}
-                  disabled={field.disabled}
-                  value={field.value ? 'true' : 'false'}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="false">Non</SelectItem>
-                    <SelectItem value="true">Oui</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="auditTrail.consultationComment"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Consultation de l’Audit Trail | Commentaires
-                </FormLabel>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid grid-cols-2 bg-white rounded-lg p-4 gap-4 mt-2"
+      >
+        <FormField
+          control={form.control}
+          name="auditTrail.consultation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Consultation de l’Audit Trail</FormLabel>
+              <Select
+                onValueChange={(value) => field.onChange(value === 'true')}
+                defaultValue={field.value ? 'true' : 'false'}
+                disabled={field.disabled}
+                value={field.value ? 'true' : 'false'}
+              >
                 <FormControl>
-                  <Textarea {...field} />
+                  <SelectTrigger>
+                    <SelectValue placeholder="" />
+                  </SelectTrigger>
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="auditTrail.revueComment"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Revue de l’Audit Trail | Commentaires</FormLabel>
+                <SelectContent>
+                  <SelectItem value="false">Non</SelectItem>
+                  <SelectItem value="true">Oui</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="auditTrail.revue"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Revue de l’Audit Trail</FormLabel>
+              <Select
+                onValueChange={(value) => field.onChange(value === 'true')}
+                defaultValue={field.value ? 'true' : 'false'}
+                disabled={field.disabled}
+                value={field.value ? 'true' : 'false'}
+              >
                 <FormControl>
-                  <Textarea {...field} />
+                  <SelectTrigger>
+                    <SelectValue placeholder="" />
+                  </SelectTrigger>
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {!readonly && (
-            <div className="col-span-2 text-center flex items-center justify-center gap-4">
-              <Button type="button" variant="secondary" onClick={cancel}>
-                Annuler
-              </Button>
-              <Button type="submit">Valider</Button>
-            </div>
+                <SelectContent>
+                  <SelectItem value="false">Non</SelectItem>
+                  <SelectItem value="true">Oui</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
           )}
-          {step.updatedAt && (
-            <div className="text-gray-300 uppercase col-span-2 text-sm">
-              MAJ le {new Date(step.updatedAt).toLocaleDateString()} par{' '}
-              {step.updatedBy}
-            </div>
+        />
+        <FormField
+          control={form.control}
+          name="auditTrail.consultationComment"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Consultation de l’Audit Trail | Commentaires
+              </FormLabel>
+              <FormControl>
+                <Textarea {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-        </form>
-      </Form>
-    </div>
+        />
+        <FormField
+          control={form.control}
+          name="auditTrail.revueComment"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Revue de l’Audit Trail | Commentaires</FormLabel>
+              <FormControl>
+                <Textarea {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {!readonly && (
+          <div className="col-span-2 text-center flex items-center justify-center gap-4">
+            <Button type="button" variant="secondary" onClick={cancel}>
+              Annuler
+            </Button>
+            <Button type="submit">Valider</Button>
+          </div>
+        )}
+        {step.updatedAt && (
+          <div className="text-gray-300 uppercase col-span-2 text-sm">
+            MAJ le {new Date(step.updatedAt).toLocaleDateString()} par{' '}
+            {step.updatedBy}
+          </div>
+        )}
+      </form>
+    </Form>
   );
 };
 

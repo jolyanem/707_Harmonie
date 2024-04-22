@@ -37,17 +37,18 @@ import { useNavigate } from '@tanstack/react-router';
 const createURSSchema = z.object({
   name: z.string().min(2).max(50),
   type: z.string(),
+  typeNeed: z.enum(['MACRO', 'DETAILED']),
   description: z.string().max(400),
-  code: z.string(),
   processType: z.string(),
 });
 
 type Props = {
   projectId: string;
   categoryStepId: string;
+  typeNeed: URSCreateDto['typeNeed'];
 };
 
-const CreateURSDialog = ({ projectId, categoryStepId }: Props) => {
+const CreateURSDialog = ({ projectId, categoryStepId, typeNeed }: Props) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const createURSMutation = useMutation({
@@ -74,9 +75,9 @@ const CreateURSDialog = ({ projectId, categoryStepId }: Props) => {
     resolver: zodResolver(createURSSchema),
     defaultValues: {
       name: '',
-      type: 'macro',
+      type: 'BUS',
+      typeNeed,
       description: '',
-      code: '',
       processType: '',
     },
   });
@@ -103,23 +104,10 @@ const CreateURSDialog = ({ projectId, categoryStepId }: Props) => {
           >
             <FormField
               control={form.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Code de l'URS</FormLabel>
-                  <FormControl>
-                    <Input placeholder="" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Type de besoin</FormLabel>
+                  <FormLabel>Type</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -130,14 +118,32 @@ const CreateURSDialog = ({ projectId, categoryStepId }: Props) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="macro">Macro</SelectItem>
-                      <SelectItem value="detailed">Détaillé</SelectItem>
+                      <SelectItem value="BUS">Business</SelectItem>
+                      <SelectItem value="REG">Réglementaire</SelectItem>
+                      <SelectItem value="INF">Infrastucture</SelectItem>
+                      <SelectItem value="HSE">HSE</SelectItem>
+                      <SelectItem value="INT">Interface</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <FormItem>
+              <FormLabel>Type de besoin</FormLabel>
+              <Select defaultValue={typeNeed} value={typeNeed} disabled>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="MACRO">Macro</SelectItem>
+                  <SelectItem value="DETAILED">Détaillé</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
             <FormField
               control={form.control}
               name="name"
@@ -170,7 +176,7 @@ const CreateURSDialog = ({ projectId, categoryStepId }: Props) => {
               name="processType"
               render={({ field }) => (
                 <FormItem className="col-span-2">
-                  <FormLabel>Process type</FormLabel>
+                  <FormLabel>Process name</FormLabel>
                   <FormControl>
                     <Input placeholder="" {...field} />
                   </FormControl>

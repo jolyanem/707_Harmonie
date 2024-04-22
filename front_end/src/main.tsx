@@ -30,7 +30,6 @@ import type {
 import './index.css';
 import '@fontsource-variable/inter';
 import StepPage from '~/routes/projects/steps/details';
-import ProjectDiagramPage from '~/routes/projects/diagram';
 import DatabasePage from '~/routes/database';
 import DatabaseProjectDetailsPage from '~/routes/database/project';
 import { AuthContext, AuthProvider, useAuth } from '~/components/auth';
@@ -98,7 +97,6 @@ const projectRoute = createRoute({
       .then((res) => res.data),
   component: ProjectPage,
 });
-
 const projectDiagramRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/projects/$projectId/diagram',
@@ -106,8 +104,9 @@ const projectDiagramRoute = createRoute({
     axios
       .get<ProjectDetailedDto>(`/projects/${params.projectId}`)
       .then((res) => res.data),
-  component: ProjectDiagramPage,
-});
+}).lazy(() =>
+  import('~/routes/projects/diagram').then((d) => d.ProjectDiagramPageRoute)
+);
 
 const stepRoute = createRoute({
   getParentRoute: () => rootRoute,

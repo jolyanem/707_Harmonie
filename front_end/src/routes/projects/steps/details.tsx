@@ -94,6 +94,7 @@ const StepPage = () => {
         <h2 className="text-xl flex items-center justify-between font-medium">
           <span>URS</span>
           <CreateURSDialog
+            typeNeed="MACRO"
             categoryStepId={categoryStep.id}
             projectId={projectId}
           />

@@ -11,6 +11,7 @@ import type {
   Test,
   User,
   Role,
+  Link,
 } from '@prisma/client';
 
 export type CategoryStepDto = Pick<CategoryStep, 'id' | 'name'> & {
@@ -69,31 +70,38 @@ export type RiskDto = Pick<
   tests: Array<TestDto>;
 };
 
+export type OperationalProcessLinkDto = Link;
+
 export type URSShortDto = Pick<URS, 'id' | 'code' | 'type' | 'name'>;
 
 export type URSDto = Pick<
   URS,
   | 'id'
+  | 'createdAt'
   | 'code'
   | 'type'
+  | 'typeNeed'
   | 'name'
   | 'description'
   | 'type'
   | 'processType'
   | 'criticalityClient'
-  | 'criticalityVSI'
+  | 'regulatoryObligation'
+  | 'businessObligation'
 > & {
   categorySteps: CategoryStepDto[];
   steps: Array<StepDto>;
   supplierResponses: Array<SupplierResponsesDto>;
   auditTrail: AuditTrailDto;
   risks: Array<RiskDto>;
+  operationalProcessLinks: Array<OperationalProcessLinkDto>;
 };
 
 export type URSCreateDto = Pick<
   URS,
-  'code' | 'type' | 'name' | 'description' | 'processType'
+  'type' | 'name' | 'description' | 'processType'
 > & {
+  typeNeed: 'MACRO' | 'DETAILED';
   categoryStepId: CategoryStep['id'];
 };
 

@@ -4,6 +4,7 @@ import { db } from './db';
 import type {
   CategoryStepCompleteDto,
   CategoryStepDto,
+  OperationalProcessLinkDto,
   ProjectDetailDatabaseDto,
   ProjectDetailedDto,
   ProjectDto,
@@ -20,6 +21,7 @@ import { CategoryStep, Statut } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { authRouter } from './routers/auth';
 import { usersRouter } from './routers/users';
+import { projectsRouter } from './routers/projects';
 
 const app = express();
 const port = 3000;
@@ -30,6 +32,19 @@ app.use(express.json());
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy' });
 });
+
+const getURSCodeNumber = async (categoryStepId: string, type: string) => {
+  const urs = await db.uRS.findMany({
+    where: {
+      categoryStepId,
+    },
+  });
+  if (!urs) {
+    return '001';
+  }
+  const codeNumber = urs.filter((urs) => urs.type === type).length + 1;
+  return ('00' + codeNumber).slice(-3);
+};
 
 app
   .get('/urs/:id', async (req, res) => {
@@ -45,6 +60,7 @@ app
             parent: true,
           },
         },
+        operationalProcessLinks: true,
         steps: {
           orderBy: {
             name: 'asc',
@@ -67,24 +83,41 @@ app
     const categorySteps = await getCategoryStepParents(urs.categoryStep);
     res.json({ ...urs, categorySteps } satisfies URSDto);
   })
+  .put('/urs/:id/step/:stepName/status', async (req, res) => {
+    console.log('[PUT] URS :', req.params.id, '> Step :', req.params.stepName);
+    const ursId = req.params.id;
+    const stepName = req.params.stepName;
+    const step = await db.step.update({
+      where: {
+        URSId_name: {
+          URSId: ursId,
+          name: stepName,
+        },
+      },
+      data: {
+        status: req.body.status,
+        updatedAt: new Date(),
+        updatedBy: '',
+      },
+    });
+  })
   .post('/urs', async (req, res) => {
     const body = req.body as URSCreateDto;
     console.log('[POST] URS');
     const urs = await db.uRS.create({
       data: {
-        code: body.code,
+        code:
+          body.type + (await getURSCodeNumber(body.categoryStepId, body.type)),
         name: body.name,
         type: body.type,
+        typeNeed: body.typeNeed,
         description: body.description,
         processType: body.processType,
         criticalityClient: 'na',
-        criticalityVSI: 'na',
+        regulatoryObligation: 'na',
+        businessObligation: 'na',
         steps: {
           create: [
-            {
-              name: '1_2',
-              status: 'todo',
-            },
             {
               name: '1_3',
               status: 'todo',
@@ -194,9 +227,50 @@ app
         },
         data: {
           criticalityClient: req.body.criticalityClient,
-          criticalityVSI: req.body.criticalityVSI,
+          businessObligation: req.body.businessObligation,
+          regulatoryObligation: req.body.regulatoryObligation,
         },
       });
+    }
+    if (step.name === '3_1') {
+      const newOperationalProcessLinks = req.body
+        .operationalProcessLinks as Array<OperationalProcessLinkDto>;
+      const oldOperationalProcessLinks = await db.link.findMany({
+        where: {
+          URSId: ursId,
+        },
+      });
+      const operationalProcessLinksToDelete = oldOperationalProcessLinks.filter(
+        (oldOperationalProcessLink) =>
+          !newOperationalProcessLinks.some(
+            (operationalProcessLink) =>
+              operationalProcessLink.id === oldOperationalProcessLink.id
+          )
+      );
+      for (const operationalProcessLink of operationalProcessLinksToDelete) {
+        await db.link.delete({
+          where: {
+            id: operationalProcessLink.id,
+          },
+        });
+      }
+      for (const operationalProcessLink of newOperationalProcessLinks) {
+        await db.link.upsert({
+          where: {
+            id: operationalProcessLink.id,
+          },
+          update: {
+            name: operationalProcessLink.name,
+            link: operationalProcessLink.link,
+          },
+          create: {
+            id: operationalProcessLink.id,
+            name: operationalProcessLink.name,
+            link: operationalProcessLink.link,
+            URSId: ursId,
+          },
+        });
+      }
     }
     if (step.name === '4_4') {
       const newSupplierResponses = req.body
@@ -470,82 +544,6 @@ app.get('/database/projects/:id', async (req, res) => {
   } satisfies ProjectDetailDatabaseDto);
 });
 
-app
-  .get('/projects', async (req, res) => {
-    console.log('[GET] Projects');
-    const projects = await db.project.findMany();
-    res.json(projects satisfies Array<ProjectDto>);
-  })
-  .post('/projects', async (req, res) => {
-    console.log('[POST] Project :', req.body.name);
-    const project = await db.project.create({
-      data: {
-        name: req.body.name,
-        client: req.body.client,
-      },
-    });
-    res.json(project satisfies ProjectDto);
-  })
-  .patch('/projects/:id', async (req, res) => {
-    console.log('[PATCH] Project :', req.params.id);
-    const body = req.body as ProjectPatchDto;
-    const project = await db.project.update({
-      where: {
-        id: parseInt(req.params.id),
-      },
-      data: {
-        name: body.name,
-        client: body.client,
-      },
-    });
-    res.json(project satisfies ProjectDto);
-  })
-  .get('/projects/:id', async (req, res) => {
-    console.log('[GET] Project :', req.params.id);
-    const project = await db.project.findUnique({
-      where: {
-        id: parseInt(req.params.id),
-      },
-    });
-    if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
-    }
-    const categorySteps = await db.categoryStep.findMany({
-      include: {
-        URS: true,
-        children: {
-          include: {
-            URS: true,
-            children: {
-              include: {
-                URS: true,
-                children: {
-                  include: {
-                    URS: true,
-                    children: {
-                      include: {
-                        URS: true,
-                        children: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      where: {
-        projectId: project.id,
-        parentId: null,
-      },
-    });
-    res.json({
-      ...project,
-      categorySteps,
-    } satisfies ProjectDetailedDto);
-  });
-
 const getCategoryStepParents = async (parent?: CategoryStep | null) => {
   let parents: CategoryStepDto[] = [];
   let currentParent = parent;
@@ -604,6 +602,7 @@ app
   });
 
 app.use('/users', usersRouter);
+app.use('/projects', projectsRouter);
 app.use('/auth', authRouter);
 
 app.listen(port, () => {

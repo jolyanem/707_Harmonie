@@ -6,7 +6,7 @@ import type { URSDto } from 'backend-types';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import type { StepProps } from '~/components/URS/steps/all';
+import { type StepProps } from '~/components/URS/steps/all';
 import { Button } from '~/components/ui/button';
 import {
   Form,
@@ -26,13 +26,15 @@ import {
 
 type Props = StepProps & {
   criticalityClient: string;
-  criticalityVSI: string;
+  regulatoryObligation: string;
+  businessObligation: string;
 };
 
 const step1_3Schema = z.object({
   status: z.string(),
   criticalityClient: z.string(),
-  criticalityVSI: z.string(),
+  regulatoryObligation: z.string(),
+  businessObligation: z.string(),
 });
 
 const Step1_3 = ({
@@ -41,7 +43,8 @@ const Step1_3 = ({
   readonly,
   setReadonly,
   criticalityClient,
-  criticalityVSI,
+  regulatoryObligation,
+  businessObligation,
 }: Props) => {
   const router = useRouter();
   const updateStepMutation = useMutation({
@@ -60,7 +63,8 @@ const Step1_3 = ({
     defaultValues: {
       ...step,
       criticalityClient: criticalityClient,
-      criticalityVSI: criticalityVSI,
+      regulatoryObligation: regulatoryObligation,
+      businessObligation: businessObligation,
     },
     disabled: readonly,
   });
@@ -75,114 +79,109 @@ const Step1_3 = ({
   }
 
   return (
-    <div>
-      <h2 className="font-semibold text-lg uppercase">
-        ÉTAPE 1.3 | ÉTUDE CRITICITÉ
-      </h2>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-2 bg-white rounded-lg p-4 gap-4 mt-2"
-        >
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem className="col-span-2 max-w-[30ch]">
-                <FormLabel>Status d'avancement</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  disabled={field.disabled}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="na">Sans objet</SelectItem>
-                    <SelectItem value="todo">A réaliser</SelectItem>
-                    <SelectItem value="in_progress">En cours</SelectItem>
-                    <SelectItem value="finished">Terminé</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="criticalityClient"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Criticité Client</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  disabled={field.disabled}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="na">Non renseigné</SelectItem>
-                    <SelectItem value="N">Non</SelectItem>
-                    <SelectItem value="Y">Oui</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="criticalityVSI"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Criticité VSI</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  disabled={field.disabled}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="na">Non renseigné</SelectItem>
-                    <SelectItem value="N">Non</SelectItem>
-                    <SelectItem value="Y">Oui</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {!readonly && (
-            <div className="col-span-2 text-center flex items-center justify-center gap-4">
-              <Button type="button" variant="secondary" onClick={cancel}>
-                Annuler
-              </Button>
-              <Button type="submit">Valider</Button>
-            </div>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid grid-cols-3 bg-white rounded-lg p-4 gap-4 mt-2"
+      >
+        <FormField
+          control={form.control}
+          name="criticalityClient"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Criticité Client</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={field.disabled}
+                value={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="na">Non renseigné</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
           )}
-          {step.updatedAt && (
-            <div className="text-gray-300 uppercase text-sm col-span-2">
-              MAJ le {new Date(step.updatedAt).toLocaleDateString()} par{' '}
-              {step.updatedBy}
-            </div>
+        />
+        <FormField
+          control={form.control}
+          name="regulatoryObligation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Obligation Réglementaire</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={field.disabled}
+                value={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="na">Non renseigné</SelectItem>
+                  <SelectItem value="Y">Oui</SelectItem>
+                  <SelectItem value="N">Non</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
           )}
-        </form>
-      </Form>
-    </div>
+        />
+        <FormField
+          control={form.control}
+          name="businessObligation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Obligation Business</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={field.disabled}
+                value={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="na">Non renseigné</SelectItem>
+                  <SelectItem value="Y">Oui</SelectItem>
+                  <SelectItem value="N">Non</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {!readonly && (
+          <div className="col-span-2 text-center flex items-center justify-center gap-4">
+            <Button type="button" variant="secondary" onClick={cancel}>
+              Annuler
+            </Button>
+            <Button type="submit">Valider</Button>
+          </div>
+        )}
+        {step.updatedAt && (
+          <div className="text-gray-300 uppercase text-sm col-span-2">
+            MAJ le {new Date(step.updatedAt).toLocaleDateString()} par{' '}
+            {step.updatedBy}
+          </div>
+        )}
+      </form>
+    </Form>
   );
 };
 

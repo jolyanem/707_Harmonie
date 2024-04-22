@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken';
 import express from 'express';
 import { db } from '../db';
 import { UserDto } from '../types';

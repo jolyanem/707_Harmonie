@@ -41,6 +41,7 @@ type Props = {
   urs: Pick<
     URSDto,
     | 'id'
+    | 'createdAt'
     | 'name'
     | 'code'
     | 'type'
@@ -148,7 +149,7 @@ const URSInfo = ({ urs }: Props) => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="bg-white rounded-lg p-4 gap-4 mt-2 relative"
         >
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <FormField
               control={form.control}
               name="name"
@@ -188,11 +189,26 @@ const URSInfo = ({ urs }: Props) => {
                 </FormItem>
               )}
             />
+            <FormItem>
+              <FormLabel>Créé le</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  value={new Date(urs.createdAt).toLocaleDateString('fr-FR', {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                  })}
+                  disabled
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem className="col-span-2">
+                <FormItem className="col-span-3">
                   <FormLabel>Description de l'URS</FormLabel>
                   <FormControl>
                     <Textarea className="resize-none" {...field} />

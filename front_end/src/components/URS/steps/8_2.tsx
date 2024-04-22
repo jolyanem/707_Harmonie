@@ -26,13 +26,6 @@ import {
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
 import { Separator } from '~/components/ui/separator';
 import { Textarea } from '~/components/ui/textarea';
 import { useState } from 'react';
@@ -91,93 +84,56 @@ const Step8_2 = ({ ursId, step, readonly, setReadonly, risks }: Props) => {
   }
 
   return (
-    <div>
-      <h2 className="font-semibold text-lg uppercase">
-        ÉTAPE 8.2 | TESTS QUALIFIANTS BASÉS SUR L’ANALYSE DE RISQUE
-      </h2>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-2 bg-white rounded-lg p-4 gap-4 mt-2"
-        >
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem className="col-span-2 max-w-[30ch]">
-                <FormLabel>Status d'avancement</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  disabled={field.disabled}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="na">Sans objet</SelectItem>
-                    <SelectItem value="todo">A réaliser</SelectItem>
-                    <SelectItem value="in_progress">En cours</SelectItem>
-                    <SelectItem value="finished">Terminé</SelectItem>
-                  </SelectContent>
-                </Select>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid grid-cols-2 bg-white rounded-lg p-4 gap-4 mt-2"
+      >
+        {risksFieldArray.fields.map((field, index) => (
+          <div key={field.id} className="w-full col-span-2">
+            <Separator className="my-4" />
+            <h3 className="font-semibold text-lg uppercase text-slate-500">
+              Risque {index + 1}
+            </h3>
+            <div className="grid grid-cols-4 gap-2">
+              <FormItem className="col-span-2">
+                <FormLabel>Description de la défaillance</FormLabel>
+                <FormControl>
+                  <Input disabled value={risks[index]?.deficiencyDescription} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
-            )}
-          />
-
-          {risksFieldArray.fields.map((field, index) => (
-            <div key={field.id} className="w-full col-span-2">
-              <Separator className="my-4" />
-              <h3 className="font-semibold text-lg uppercase text-slate-500">
-                Risque {index + 1}
-              </h3>
-              <div className="grid grid-cols-4 gap-2">
-                <FormItem className="col-span-2">
-                  <FormLabel>Description de la défaillance</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled
-                      value={risks[index]?.deficiencyDescription}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-                <FormItem className="col-span-2">
-                  <FormLabel>Conséquence</FormLabel>
-                  <FormControl>
-                    <Input disabled value={risks[index].consequence} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </div>
-              <Tests
-                riskIndex={index}
-                control={form.control}
-                readonly={readonly}
-              />
+              <FormItem className="col-span-2">
+                <FormLabel>Conséquence</FormLabel>
+                <FormControl>
+                  <Input disabled value={risks[index].consequence} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             </div>
-          ))}
-          {!readonly && (
-            <div className="col-span-2 text-center flex items-center justify-center gap-4">
-              <Button type="button" variant="secondary" onClick={cancel}>
-                Annuler
-              </Button>
-              <Button type="submit">Valider</Button>
-            </div>
-          )}
-          {step.updatedAt && (
-            <div className="text-gray-300 uppercase col-span-2 text-sm">
-              MAJ le {new Date(step.updatedAt).toLocaleDateString()} par{' '}
-              {step.updatedBy}
-            </div>
-          )}
-        </form>
-      </Form>
-    </div>
+            <Tests
+              riskIndex={index}
+              control={form.control}
+              readonly={readonly}
+            />
+          </div>
+        ))}
+        {!readonly && (
+          <div className="col-span-2 text-center flex items-center justify-center gap-4">
+            <Button type="button" variant="secondary" onClick={cancel}>
+              Annuler
+            </Button>
+            <Button type="submit">Valider</Button>
+          </div>
+        )}
+        {step.updatedAt && (
+          <div className="text-gray-300 uppercase col-span-2 text-sm">
+            MAJ le {new Date(step.updatedAt).toLocaleDateString()} par{' '}
+            {step.updatedBy}
+          </div>
+        )}
+      </form>
+    </Form>
   );
 };
 
