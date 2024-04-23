@@ -15,9 +15,20 @@ datasource db {
 
 model Project {
   id        Int      @id @default(autoincrement())
-  name      String   @db.Text
-  client    String   @db.Text
   createdAt DateTime @default(now())
+
+  name                        String   @db.Text
+  client                      String   @db.Text
+  objective                   String   @db.Text
+  // dates     String   @db.Text
+  clientProjectLead           String   @db.Text
+  clientQualityRepresentative String   @db.Text
+  // clientProcessRepresentatives String @db.Text
+  leadAMOA                    String   @db.Text
+  leadValidation              String   @db.Text
+  // applicableRegulations String @db.Text
+  providersMacro              String[] @db.Text
+  providersDetailed           String[] @db.Text
 
   categorySteps CategoryStep[]
 }

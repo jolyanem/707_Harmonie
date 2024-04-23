@@ -45,6 +45,7 @@ type Props = {
     | 'name'
     | 'code'
     | 'type'
+    | 'typeNeed'
     | 'description'
     | 'categorySteps'
     | 'processType'
@@ -54,6 +55,7 @@ type Props = {
 const ursInfoSchema = z.object({
   name: z.string().min(2).max(50),
   type: z.string(),
+  typeNeed: z.string(),
   description: z.string().max(400),
   processType: z.string(),
 });
@@ -76,6 +78,7 @@ const URSInfo = ({ urs }: Props) => {
     defaultValues: {
       name: urs.name,
       type: urs.type,
+      typeNeed: urs.typeNeed,
       description: urs.description,
       processType: urs.processType,
     },
@@ -168,6 +171,35 @@ const URSInfo = ({ urs }: Props) => {
               name="type"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={field.disabled}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="BUS">Business</SelectItem>
+                      <SelectItem value="REG">Réglementaire</SelectItem>
+                      <SelectItem value="INF">Infrastucture</SelectItem>
+                      <SelectItem value="HSE">HSE</SelectItem>
+                      <SelectItem value="INT">Interface</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="typeNeed"
+              render={({ field }) => (
+                <FormItem>
                   <FormLabel>Type de besoin</FormLabel>
                   <Select
                     onValueChange={field.onChange}
@@ -181,29 +213,14 @@ const URSInfo = ({ urs }: Props) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="macro">Macro</SelectItem>
-                      <SelectItem value="detailed">Détaillé</SelectItem>
+                      <SelectItem value="MACRO">Macro</SelectItem>
+                      <SelectItem value="DETAILED">Détaillé</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormItem>
-              <FormLabel>Créé le</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder=""
-                  value={new Date(urs.createdAt).toLocaleDateString('fr-FR', {
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                  })}
-                  disabled
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
             <FormField
               control={form.control}
               name="description"
@@ -217,8 +234,16 @@ const URSInfo = ({ urs }: Props) => {
                 </FormItem>
               )}
             />
+            <p className="text-sm text-gray-400 text-end col-span-3">
+              Créé le{' '}
+              {new Date(urs.createdAt).toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+              })}
+            </p>
           </div>
-          <Separator className="my-4 w-3/4 mx-auto" />
+          <Separator className="my-4 mx-auto" />
           <div className="grid grid-cols-2">
             <FormField
               control={form.control}

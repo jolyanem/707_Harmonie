@@ -16,6 +16,13 @@ projectsRouter
       data: {
         name: req.body.name,
         client: req.body.client,
+        objective: req.body.objective,
+        clientProjectLead: req.body.clientProjectLead,
+        clientQualityRepresentative: req.body.clientQualityRepresentative,
+        leadAMOA: req.body.leadAMOA,
+        leadValidation: req.body.leadValidation,
+        providersMacro: req.body.providersMacro,
+        providersDetailed: req.body.providersDetailed,
       },
     });
     res.json(project satisfies ProjectDto);
@@ -30,6 +37,13 @@ projectsRouter
       data: {
         name: body.name,
         client: body.client,
+        objective: req.body.objective,
+        clientProjectLead: req.body.clientProjectLead,
+        clientQualityRepresentative: req.body.clientQualityRepresentative,
+        leadAMOA: req.body.leadAMOA,
+        leadValidation: req.body.leadValidation,
+        providersMacro: req.body.providersMacro,
+        providersDetailed: req.body.providersDetailed,
       },
     });
     res.json(project satisfies ProjectDto);

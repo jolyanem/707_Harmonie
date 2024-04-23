@@ -112,7 +112,7 @@ const Step3_1 = ({
         className="grid grid-cols-2 bg-white rounded-lg p-4 gap-4 mt-2"
       >
         {operationalProcessLinksFieldArray.fields.length === 0 ? (
-          <div className="text-gray-400">Aucun liens</div>
+          <div className="text-gray-400">Aucun</div>
         ) : (
           <div className="col-span-2 flex items-center gap-4">
             {operationalProcessLinksFieldArray.fields.map((field, index) => (

@@ -193,6 +193,7 @@ app
         name: body.name,
         description: body.description,
         type: body.type,
+        typeNeed: body.typeNeed,
         processType: body.processType,
       },
     });

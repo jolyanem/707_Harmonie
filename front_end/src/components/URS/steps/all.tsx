@@ -32,7 +32,7 @@ export type StepProps = {
 };
 
 const StepWrapper = ({ ursId, step }: StepProps) => {
-  const urs = useLoaderData({
+  const { urs, project } = useLoaderData({
     from: '/projects/$projectId/urs/$id',
   });
   const [readonly, setReadonly] = useState(true);
@@ -76,6 +76,9 @@ const StepWrapper = ({ ursId, step }: StepProps) => {
                   readonly={readonly}
                   setReadonly={setReadonly}
                   supplierResponses={urs.supplierResponses}
+                  ursTypeNeed={urs.typeNeed}
+                  projectMacroSuppliers={project.providersMacro}
+                  projectDetailedSuppliers={project.providersDetailed}
                 />
               );
             case '6_7':

@@ -4,7 +4,7 @@ import { AllSteps } from '~/components/URS/steps/all';
 import AllStepsStatus from '~/components/URS/steps/all-status';
 
 function URSFichePage() {
-  const urs = useLoaderData({
+  const { urs } = useLoaderData({
     from: '/projects/$projectId/urs/$id',
   });
 

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import type { URSDto } from 'backend-types';
+import type { ProjectDto, URSDto } from 'backend-types';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -51,6 +51,9 @@ import {
 
 type Props = StepProps & {
   supplierResponses: URSDto['supplierResponses'];
+  ursTypeNeed: URSDto['type'];
+  projectMacroSuppliers: ProjectDto['providersMacro'];
+  projectDetailedSuppliers: ProjectDto['providersDetailed'];
 };
 
 const step4_4Schema = z.object({
@@ -79,6 +82,9 @@ const Step4_4 = ({
   readonly,
   setReadonly,
   supplierResponses,
+  ursTypeNeed,
+  projectMacroSuppliers,
+  projectDetailedSuppliers,
 }: Props) => {
   const router = useRouter();
   const updateStepMutation = useMutation({
@@ -125,7 +131,13 @@ const Step4_4 = ({
   };
 
   function onSubmit(values: z.infer<typeof step4_4Schema>) {
-    updateStepMutation.mutate(values);
+    updateStepMutation.mutate({
+      ...values,
+      supplierResponses: values.supplierResponses.map((s) => ({
+        ...s,
+        statut: s.answer !== '',
+      })),
+    });
   }
 
   return (
@@ -135,7 +147,7 @@ const Step4_4 = ({
         className="grid grid-cols-2 bg-white rounded-lg p-4 gap-4 mt-2"
       >
         {supplierResponsesFieldArray.fields.length === 0 ? (
-          <div className="text-gray-400">Aucun réponse fournisseur</div>
+          <div className="text-gray-400">Aucun</div>
         ) : (
           supplierResponsesFieldArray.fields.map((field, index) => (
             <div key={field.id} className="col-span-2 gap-2">
@@ -144,13 +156,14 @@ const Step4_4 = ({
                 <FormField
                   control={form.control}
                   name={`supplierResponses.${index}.statut`}
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem className="flex items-center gap-2 space-y-0">
                       <FormControl>
                         <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={field.disabled}
+                          checked={
+                            form.watch(`supplierResponses.${index}.answer`) !==
+                            ''
+                          }
                         />
                       </FormControl>
                       <FormLabel>Répondu</FormLabel>
@@ -329,10 +342,28 @@ const Step4_4 = ({
                   control={addSupplierResponseForm.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nom</FormLabel>
-                      <Input {...field} />
-                    </FormItem>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={field.disabled}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {(ursTypeNeed === 'MACRO'
+                          ? projectMacroSuppliers
+                          : projectDetailedSuppliers
+                        ).map((supplier) => (
+                          <SelectItem key={supplier} value={supplier}>
+                            {supplier}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
                 />
                 <DialogFooter>

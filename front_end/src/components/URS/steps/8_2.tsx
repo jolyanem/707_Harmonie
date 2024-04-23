@@ -89,35 +89,42 @@ const Step8_2 = ({ ursId, step, readonly, setReadonly, risks }: Props) => {
         onSubmit={form.handleSubmit(onSubmit)}
         className="grid grid-cols-2 bg-white rounded-lg p-4 gap-4 mt-2"
       >
-        {risksFieldArray.fields.map((field, index) => (
-          <div key={field.id} className="w-full col-span-2">
-            <Separator className="my-4" />
-            <h3 className="font-semibold text-lg uppercase text-slate-500">
-              Risque {index + 1}
-            </h3>
-            <div className="grid grid-cols-4 gap-2">
-              <FormItem className="col-span-2">
-                <FormLabel>Description de la défaillance</FormLabel>
-                <FormControl>
-                  <Input disabled value={risks[index]?.deficiencyDescription} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-              <FormItem className="col-span-2">
-                <FormLabel>Conséquence</FormLabel>
-                <FormControl>
-                  <Input disabled value={risks[index].consequence} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+        {risksFieldArray.fields.length === 0 ? (
+          <div className="text-gray-400">Aucun</div>
+        ) : (
+          risksFieldArray.fields.map((field, index) => (
+            <div key={field.id} className="w-full col-span-2">
+              <Separator className="my-4" />
+              <h3 className="font-semibold text-lg uppercase text-slate-500">
+                Risque {index + 1}
+              </h3>
+              <div className="grid grid-cols-4 gap-2">
+                <FormItem className="col-span-2">
+                  <FormLabel>Description de la défaillance</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled
+                      value={risks[index]?.deficiencyDescription}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+                <FormItem className="col-span-2">
+                  <FormLabel>Conséquence</FormLabel>
+                  <FormControl>
+                    <Input disabled value={risks[index].consequence} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </div>
+              <Tests
+                riskIndex={index}
+                control={form.control}
+                readonly={readonly}
+              />
             </div>
-            <Tests
-              riskIndex={index}
-              control={form.control}
-              readonly={readonly}
-            />
-          </div>
-        ))}
+          ))
+        )}
         {!readonly && (
           <div className="col-span-2 text-center flex items-center justify-center gap-4">
             <Button type="button" variant="secondary" onClick={cancel}>

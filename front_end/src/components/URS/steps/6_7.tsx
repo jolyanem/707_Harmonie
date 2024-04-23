@@ -108,221 +108,225 @@ const Step6_7 = ({ ursId, step, readonly, setReadonly, risks }: Props) => {
         onSubmit={form.handleSubmit(onSubmit)}
         className="grid bg-white rounded-lg p-4 gap-4 mt-2"
       >
-        {risksFieldArray.fields.map((field, index) => (
-          <div key={field.id} className="w-full">
-            <Separator className="my-4" />
-            <h3 className="font-semibold text-lg uppercase text-slate-500">
-              Risque {index + 1}
-            </h3>
-            <div className="grid grid-cols-3 gap-2">
-              <FormField
-                control={form.control}
-                name={`risks.${index}.deficiencyDescription`}
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Description de la défaillance</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`risks.${index}.riskClass`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Classe de risque</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      value={field.value}
-                      disabled={field.disabled}
-                    >
+        {risksFieldArray.fields.length === 0 ? (
+          <div className="text-gray-400">Aucun</div>
+        ) : (
+          risksFieldArray.fields.map((field, index) => (
+            <div key={field.id} className="w-full">
+              <Separator className="my-4" />
+              <h3 className="font-semibold text-lg uppercase text-slate-500">
+                Risque {index + 1}
+              </h3>
+              <div className="grid grid-cols-3 gap-2">
+                <FormField
+                  control={form.control}
+                  name={`risks.${index}.deficiencyDescription`}
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Description de la défaillance</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="" />
-                        </SelectTrigger>
+                        <Input {...field} />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="low">Bas</SelectItem>
-                        <SelectItem value="medium">Moyen</SelectItem>
-                        <SelectItem value="high">Haut</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`risks.${index}.consequence`}
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Conséquence</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`risks.${index}.impact`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Impact</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        {...field}
-                        min={1}
-                        max={3}
-                        onChange={(event) =>
-                          field.onChange(+event.target.value)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`risks.${index}.comment`}
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Commentaire</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`risks.${index}.riskResidueLevel`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Niveau de risque résiduel</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={field.disabled}
-                      value={field.value}
-                    >
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`risks.${index}.riskClass`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Classe de risque</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        value={field.value}
+                        disabled={field.disabled}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="low">Bas</SelectItem>
+                          <SelectItem value="medium">Moyen</SelectItem>
+                          <SelectItem value="high">Haut</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`risks.${index}.consequence`}
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Conséquence</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="" />
-                        </SelectTrigger>
+                        <Input {...field} />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="low">Bas</SelectItem>
-                        <SelectItem value="medium">Moyen</SelectItem>
-                        <SelectItem value="high">Haut</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormLabel className="col-span-3">Plan d'action</FormLabel>
-              <FormField
-                control={form.control}
-                name={`risks.${index}.actionPlan.qiqo`}
-                render={({ field }) => (
-                  <FormItem className="flex items-center space-y-0 gap-2">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`risks.${index}.impact`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Impact</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          min={1}
+                          max={3}
+                          onChange={(event) =>
+                            field.onChange(+event.target.value)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`risks.${index}.comment`}
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Commentaire</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`risks.${index}.riskResidueLevel`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Niveau de risque résiduel</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
                         disabled={field.disabled}
-                      />
-                    </FormControl>
-                    <FormLabel>QI / QO</FormLabel>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="low">Bas</SelectItem>
+                          <SelectItem value="medium">Moyen</SelectItem>
+                          <SelectItem value="high">Haut</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormLabel className="col-span-3">Plan d'action</FormLabel>
+                <FormField
+                  control={form.control}
+                  name={`risks.${index}.actionPlan.qiqo`}
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-y-0 gap-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={field.disabled}
+                        />
+                      </FormControl>
+                      <FormLabel>QI / QO</FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`risks.${index}.actionPlan.documentation`}
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-y-0 gap-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={field.disabled}
+                        />
+                      </FormControl>
+                      <FormLabel>Documentation</FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`risks.${index}.actionPlan.datamigration`}
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-y-0 gap-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={field.disabled}
+                        />
+                      </FormControl>
+                      <FormLabel>Data Migration</FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`risks.${index}.actionPlan.revueConfig`}
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-y-0 gap-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={field.disabled}
+                        />
+                      </FormControl>
+                      <FormLabel>Revue de configuration</FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`risks.${index}.actionPlan.qp`}
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-y-0 gap-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={field.disabled}
+                        />
+                      </FormControl>
+                      <FormLabel>QP</FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <Causes
+                riskIndex={index}
                 control={form.control}
-                name={`risks.${index}.actionPlan.documentation`}
-                render={({ field }) => (
-                  <FormItem className="flex items-center space-y-0 gap-2">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={field.disabled}
-                      />
-                    </FormControl>
-                    <FormLabel>Documentation</FormLabel>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`risks.${index}.actionPlan.datamigration`}
-                render={({ field }) => (
-                  <FormItem className="flex items-center space-y-0 gap-2">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={field.disabled}
-                      />
-                    </FormControl>
-                    <FormLabel>Data Migration</FormLabel>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`risks.${index}.actionPlan.revueConfig`}
-                render={({ field }) => (
-                  <FormItem className="flex items-center space-y-0 gap-2">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={field.disabled}
-                      />
-                    </FormControl>
-                    <FormLabel>Revue de configuration</FormLabel>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name={`risks.${index}.actionPlan.qp`}
-                render={({ field }) => (
-                  <FormItem className="flex items-center space-y-0 gap-2">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={field.disabled}
-                      />
-                    </FormControl>
-                    <FormLabel>QP</FormLabel>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                readonly={readonly}
               />
             </div>
-            <Causes
-              riskIndex={index}
-              control={form.control}
-              readonly={readonly}
-            />
-          </div>
-        ))}
+          ))
+        )}
 
         {!readonly && (
           <div className="mx-auto flex gap-2 items-center">

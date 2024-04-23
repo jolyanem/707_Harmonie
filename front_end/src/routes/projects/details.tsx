@@ -1,6 +1,7 @@
 import { Link, useLoaderData } from '@tanstack/react-router';
 import LinkToDiagram from '~/components/LinkToDiagram';
 import CreateCategoryStepDialog from '~/components/categorySteps/CreateCategoryStepDialog';
+import CreateProjectDialog from '~/components/projects/CreateProjectDialog';
 
 const ProjectPage = () => {
   const project = useLoaderData({
@@ -10,7 +11,10 @@ const ProjectPage = () => {
     <div>
       <header className="flex items-center justify-between">
         <h1 className="font-bold text-2xl">{project.name}</h1>
-        <LinkToDiagram projectId={project.id.toString()} />
+        <div className="flex gap-2">
+          <CreateProjectDialog project={project} />
+          <LinkToDiagram projectId={project.id.toString()} />
+        </div>
       </header>
       <section className="mt-4">
         <h2 className="text-xl flex items-center justify-between font-medium">

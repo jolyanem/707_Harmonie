@@ -107,7 +107,7 @@ export type URSCreateDto = Pick<
 
 export type URSPutDto = Pick<
   URS,
-  'code' | 'type' | 'name' | 'description' | 'processType'
+  'code' | 'type' | 'name' | 'description' | 'processType' | 'typeNeed'
 > & {
   categorySteps: Array<{
     id: CategoryStep['id'];
@@ -115,7 +115,20 @@ export type URSPutDto = Pick<
   }>;
 };
 
-export type ProjectDto = Pick<Project, 'id' | 'name' | 'client' | 'createdAt'>;
+export type ProjectDto = Pick<
+  Project,
+  | 'id'
+  | 'name'
+  | 'client'
+  | 'createdAt'
+  | 'objective'
+  | 'clientProjectLead'
+  | 'clientQualityRepresentative'
+  | 'leadAMOA'
+  | 'leadValidation'
+  | 'providersMacro'
+  | 'providersDetailed'
+>;
 
 export type ProjectDetailDatabaseDto = Pick<
   Project,
@@ -131,7 +144,7 @@ export type ProjectDetailDatabaseDto = Pick<
 
 export type ProjectPatchDto = Pick<Project, 'name' | 'client'>;
 
-export type ProjectDetailedDto = Pick<Project, 'id' | 'name' | 'client'> & {
+export type ProjectDetailedDto = Project & {
   categorySteps: Array<
     CategoryStep & {
       URS: Array<URSShortDto>;

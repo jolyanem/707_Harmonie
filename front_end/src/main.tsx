@@ -123,8 +123,18 @@ const stepRoute = createRoute({
 const ursFicheRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/projects/$projectId/urs/$id',
-  loader: ({ params }) =>
-    axios.get<URSDto>(`/urs/${params.id}`).then((res) => res.data),
+  loader: async ({ params }) => {
+    const res = await Promise.all([
+      axios
+        .get<ProjectDto>(`/projects/${params.projectId}`)
+        .then((res) => res.data),
+      axios.get<URSDto>(`/urs/${params.id}`).then((res) => res.data),
+    ]);
+    return {
+      project: res[0],
+      urs: res[1],
+    };
+  },
   component: URSFichePage,
 });
 

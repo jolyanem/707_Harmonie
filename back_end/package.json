@@ -7,7 +7,8 @@
     "prisma": "prisma",
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push"
   },
   "keywords": [],
   "author": "",
