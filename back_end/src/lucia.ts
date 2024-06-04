@@ -6,7 +6,7 @@ import type { Request, Response, NextFunction } from 'express';
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
     attributes: {
-      secure: process.env.NODE_ENV === 'PRODUCTION', // set `Secure` flag in HTTPS
+      secure: process.env.NODE_ENV === 'PRODUCTION',
     },
     name: 'harmonie_auth_session',
   },
