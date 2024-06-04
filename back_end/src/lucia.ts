@@ -6,7 +6,8 @@ export const lucia = new Lucia(adapter, {
   sessionCookie: {
     attributes: {
       secure: process.env.NODE_ENV === 'PRODUCTION',
-      domain: process.env.FRONTEND_URL,
+      domain: new URL(process.env.BACKEND_URL ?? 'http://localhost:3000')
+        .hostname,
     },
     name: 'harmonie_auth_session',
   },
