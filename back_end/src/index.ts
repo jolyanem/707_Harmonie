@@ -52,9 +52,7 @@ declare global {
   }
 }
 
-apiRouter.get('/health', (req, res) => {
-  res.json({ status: 'healthy' });
-});
+apiRouter.get('/health', (_req, res) => res.json({ status: 'healthy' }));
 
 apiRouter.use('/auth', authRouter);
 
@@ -73,7 +71,7 @@ const getURSCodeNumber = async (categoryStepId: string, type: string) => {
   return ('00' + codeNumber).slice(-3);
 };
 
-app
+apiRouter
   .get('/urs/:id', async (req, res) => {
     console.log('[GET] URS :', req.params.id);
     const id = req.params.id;
@@ -614,7 +612,7 @@ const getCategoryStepParents = async (parent?: CategoryStep | null) => {
   return parents;
 };
 
-app
+apiRouter
   .post('/projects/:projectId/step', async (req, res) => {
     if (res.locals.user?.role !== 'Collaborateur') {
       return res.status(403).json({
@@ -664,6 +662,7 @@ apiRouter.use('/projects', projectsRouter);
 apiRouter.use('/database', databaseRouter);
 
 apiRouter.use('/api', apiRouter);
+app.use('/api', apiRouter);
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
