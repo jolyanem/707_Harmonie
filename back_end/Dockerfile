@@ -13,4 +13,6 @@ RUN npm run postinstall
 
 EXPOSE 3000
 
+ENV NODE_ENV production
+
 CMD ["npm", "run", "start"]
