@@ -28,19 +28,20 @@ import { databaseRouter } from './routers/database.js';
 
 const app = express();
 const port = 3000;
+const apiRouter = express.Router();
 
-app.use(
+apiRouter.use(
   cors({
     origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
     credentials: true,
   })
 );
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+apiRouter.use(express.json());
+apiRouter.use(express.urlencoded({ extended: true }));
 
-app.use(originMiddleware);
+apiRouter.use(originMiddleware);
 
-app.use(sessionMiddleware);
+apiRouter.use(sessionMiddleware);
 
 declare global {
   namespace Express {
@@ -51,13 +52,13 @@ declare global {
   }
 }
 
-app.get('/health', (req, res) => {
+apiRouter.get('/health', (req, res) => {
   res.json({ status: 'healthy' });
 });
 
-app.use('/auth', authRouter);
+apiRouter.use('/auth', authRouter);
 
-app.use(isAuthenticatedMiddleware);
+apiRouter.use(isAuthenticatedMiddleware);
 
 const getURSCodeNumber = async (categoryStepId: string, type: string) => {
   const urs = await db.uRS.findMany({
@@ -558,7 +559,7 @@ app
     res.json(step);
   });
 
-app.get('/database/projects/:id', async (req, res) => {
+apiRouter.get('/database/projects/:id', async (req, res) => {
   if (res.locals.user?.role !== 'Collaborateur') {
     return res.status(403).json({
       message: 'You are not authorized to access this resource',
@@ -658,10 +659,11 @@ app
     } satisfies CategoryStepCompleteDto);
   });
 
-app.use('/users', usersRouter);
-app.use('/projects', projectsRouter);
-app.use('/database', databaseRouter);
+apiRouter.use('/users', usersRouter);
+apiRouter.use('/projects', projectsRouter);
+apiRouter.use('/database', databaseRouter);
 
+apiRouter.use('/api', apiRouter);
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

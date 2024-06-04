@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: |
           cd front_end
-          echo "VITE_API_URL=https://harmonie-api.raphael-catarino.fr" > .env.production
+          echo "VITE_API_URL=https://harmonie-api.raphael-catarino.fr/api" > .env.production
           npm install
           npm run build
 

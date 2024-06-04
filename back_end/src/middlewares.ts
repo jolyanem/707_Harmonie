@@ -40,7 +40,7 @@ export const sessionMiddleware = async (
   console.log('session cookie', req.headers.cookie);
 
   const sessionId = lucia.readSessionCookie(req.headers.cookie ?? '');
-  console.log('Session cookie', sessionId);
+  console.log('Sessionid', sessionId);
 
   if (!sessionId) {
     res.locals.user = null;
