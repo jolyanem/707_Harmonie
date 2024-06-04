@@ -43,7 +43,9 @@ const authRouter = express.Router();
 authRouter
   .get('/user', async (req, res) => {
     if (!res.locals.user) {
-      return res.status(403);
+      return res.status(403).json({
+        message: 'Unauthorized',
+      });
     }
     return res.json({
       id: res.locals.user.id,
@@ -53,7 +55,9 @@ authRouter
   })
   .post('/logout', async (req, res) => {
     if (!res.locals.user) {
-      return res.status(403);
+      return res.status(403).json({
+        message: 'Unauthorized',
+      });
     }
     await lucia.invalidateUserSessions(res.locals.user.id);
     return res.status(200);

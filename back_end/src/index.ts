@@ -23,7 +23,7 @@ import {
   isAuthenticatedMiddleware,
   originMiddleware,
   sessionMiddleware,
-} from './lucia.js';
+} from './middlewares.js';
 
 const app = express();
 const port = 3000;
