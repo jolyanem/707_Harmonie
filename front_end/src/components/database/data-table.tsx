@@ -29,6 +29,7 @@ interface DataTableProps<TData, TValue> {
   defaultColumn: Partial<ColumnDef<TData>>;
   data: TData[];
   onRowUpdated?: (value: TData) => void;
+  title?: string;
 }
 
 declare module '@tanstack/react-table' {
@@ -43,6 +44,7 @@ export function DataTable<TData, TValue>({
   defaultColumn,
   data,
   onRowUpdated,
+  title,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -76,7 +78,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4 gap-2">
+      <div className="flex items-center py-2 gap-2">
         <Input
           placeholder="Rechercher..."
           value={globalFilter}
@@ -85,6 +87,7 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
+        <h2 className="text-2xl font-bold text-end w-full">{title}</h2>
       </div>
       <div className="rounded-md border">
         <Table>

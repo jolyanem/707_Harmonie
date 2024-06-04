@@ -51,6 +51,8 @@ authRouter
       id: res.locals.user.id,
       email: res.locals.user.email,
       role: res.locals.user.role,
+      name: res.locals.user.name,
+      surname: res.locals.user.surname,
     });
   })
   .post('/logout', async (req, res) => {

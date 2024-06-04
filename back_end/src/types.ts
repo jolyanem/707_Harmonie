@@ -128,6 +128,7 @@ export type ProjectDto = Pick<
   | 'leadValidation'
   | 'providersMacro'
   | 'providersDetailed'
+  | 'applicableRegulations'
 >;
 
 export type ProjectDetailDatabaseDto = Pick<
@@ -174,6 +175,19 @@ export type ProjectDetailedDto = Project & {
 };
 
 export type ProjectCreateDto = Pick<Project, 'name' | 'client'>;
+
+export type CategoryStepDatabaseDto = Pick<CategoryStepDto, 'id' | 'name'> & {
+  URSCount: number;
+  childrenCount: number;
+  projectName: string;
+  projectId: number;
+  parentName?: string;
+};
+
+export type URSDatabaseDto = Pick<URSDto, 'id' | 'name'> & {
+  categoryStepName: string;
+  projectName: string;
+};
 
 export type UserDto = Pick<
   User,

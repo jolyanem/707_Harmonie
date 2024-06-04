@@ -1,7 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useNavigate } from '@tanstack/react-router';
 import { ColumnDef } from '@tanstack/react-table';
-import { ProjectDetailDatabaseDto, ProjectDto } from 'backend-types';
+import {
+  CategoryStepDatabaseDto,
+  ProjectDto,
+  URSDatabaseDto,
+} from 'backend-types';
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
@@ -17,12 +21,9 @@ export type ProjectRow = Pick<
   ProjectDto,
   'id' | 'client' | 'name' | 'createdAt'
 >;
-export type CategoryStepRow = Pick<
-  ProjectDetailDatabaseDto['categorySteps'][0],
-  'id' | 'name' | 'URSCount' | 'childrenCount'
-> & {
-  projectId: number;
-};
+export type CategoryStepRow = CategoryStepDatabaseDto;
+
+export type URSRow = URSDatabaseDto;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const defaultColumn: Partial<ColumnDef<any>> = {
@@ -113,16 +114,6 @@ export const projectsColumns: ColumnDef<ProjectRow>[] = [
             <DropdownMenuItem
               onClick={() => {
                 navigate({
-                  to: '/database/projects/$projectId',
-                  params: { projectId: project.id.toString() },
-                });
-              }}
-            >
-              Inspecter
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                navigate({
                   to: '/projects/$projectId',
                   params: { projectId: project.id.toString() },
                 });
@@ -149,6 +140,21 @@ export const projectsColumns: ColumnDef<ProjectRow>[] = [
 
 export const categoryStepColumns: ColumnDef<CategoryStepRow>[] = [
   {
+    accessorKey: 'projectName',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="shadow-none"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Nom du projet
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
     accessorKey: 'name',
     header: ({ column }) => {
       return (
@@ -174,6 +180,21 @@ export const categoryStepColumns: ColumnDef<CategoryStepRow>[] = [
     accessorFn: (row) => row.childrenCount,
     cell: ({ row }) =>
       row.original.childrenCount > 0 ? row.original.childrenCount : 'Aucun',
+  },
+  {
+    accessorKey: 'parentName',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="shadow-none"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Parent
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   },
   {
     id: 'actions',
@@ -205,6 +226,54 @@ export const categoryStepColumns: ColumnDef<CategoryStepRow>[] = [
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+      );
+    },
+  },
+];
+
+export const ursColumns: ColumnDef<URSRow>[] = [
+  {
+    accessorKey: 'projectName',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="shadow-none"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Nom du projet
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: 'categoryStepName',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="shadow-none"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Process step
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: 'name',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="shadow-none"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Nom
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
       );
     },
   },

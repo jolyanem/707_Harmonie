@@ -24,6 +24,7 @@ import {
   originMiddleware,
   sessionMiddleware,
 } from './middlewares.js';
+import { databaseRouter } from './routers/database.js';
 
 const app = express();
 const port = 3000;
@@ -659,6 +660,7 @@ app
 
 app.use('/users', usersRouter);
 app.use('/projects', projectsRouter);
+app.use('/database', databaseRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

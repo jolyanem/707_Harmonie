@@ -48,6 +48,7 @@ projectsRouter
         leadValidation: req.body.leadValidation,
         providersMacro: req.body.providersMacro,
         providersDetailed: req.body.providersDetailed,
+        applicableRegulations: req.body.applicableRegulations,
       },
     });
     res.json(project satisfies ProjectDto);

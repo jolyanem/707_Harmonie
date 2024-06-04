@@ -21,9 +21,12 @@ import ProjectPage from '~/routes/projects/details';
 
 import type {
   CategoryStepCompleteDto,
+  CategoryStepDatabaseDto,
+  CategoryStepDto,
   ProjectDetailDatabaseDto,
   ProjectDetailedDto,
   ProjectDto,
+  URSDatabaseDto,
   URSDto,
   UserDto,
 } from 'backend-types';
@@ -32,7 +35,6 @@ import './index.css';
 import '@fontsource-variable/inter';
 import StepPage from '~/routes/projects/steps/details';
 import DatabasePage from '~/routes/database';
-import DatabaseProjectDetailsPage from '~/routes/database/project';
 import { AuthContext, AuthProvider, useAuth } from '~/components/auth';
 import LoginPage from '~/routes/auth/login';
 import CallbackPage from '~/routes/auth/callback';
@@ -50,7 +52,7 @@ const catchError = (error: Error) => {
     error.response &&
     typeof error.response === 'object' &&
     'status' in error.response &&
-    error.response?.status === 403
+    (error.response?.status === 403 || error.response?.status === 401)
   ) {
     throw redirect({
       to: '/',
@@ -152,20 +154,23 @@ const ursFicheRoute = createRoute({
 const databaseRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/database',
-  loader: () =>
-    axios.get<Array<ProjectDto>>('/projects').then((res) => res.data),
+  loader: async () => {
+    const res = await Promise.all([
+      axios
+        .get<Array<ProjectDto>>('/database/projects')
+        .then((res) => res.data),
+      axios
+        .get<Array<CategoryStepDatabaseDto>>('/database/steps')
+        .then((res) => res.data),
+      axios.get<Array<URSDatabaseDto>>('/database/urs').then((res) => res.data),
+    ]);
+    return {
+      projects: res[0],
+      steps: res[1],
+      urs: res[2],
+    };
+  },
   component: DatabasePage,
-  onError: catchError,
-});
-
-const databaseProjectDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/database/projects/$projectId',
-  loader: ({ params }) =>
-    axios
-      .get<ProjectDetailDatabaseDto>(`/database/projects/${params.projectId}`)
-      .then((res) => res.data),
-  component: DatabaseProjectDetailsPage,
   onError: catchError,
 });
 
@@ -190,7 +195,6 @@ const routeTree = rootRoute.addChildren([
   stepRoute,
   ursFicheRoute,
   databaseRoute,
-  databaseProjectDetailRoute,
   loginRoute,
   authCallbackRoute,
 ]);

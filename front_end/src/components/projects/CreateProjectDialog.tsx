@@ -31,6 +31,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
+import { Textarea } from '~/components/ui/textarea';
 
 type Props = {
   project?: ProjectDto;
@@ -46,6 +47,7 @@ const createProjectSchema = z.object({
   leadValidation: z.string().min(2).max(50),
   providersMacro: z.array(z.object({ value: z.string().min(2).max(50) })),
   providersDetailed: z.array(z.object({ value: z.string().min(2).max(50) })),
+  applicableRegulations: z.string().min(2).max(50),
 });
 
 const CreateProjectDialog = ({ project }: Props) => {
@@ -112,6 +114,7 @@ const CreateProjectDialog = ({ project }: Props) => {
         project?.providersDetailed.map((x) => ({
           value: x,
         })) ?? [],
+      applicableRegulations: project?.applicableRegulations ?? '',
     },
   });
   const providersMacroFieldArray = useFieldArray({
@@ -248,6 +251,19 @@ const CreateProjectDialog = ({ project }: Props) => {
                     <FormLabel>Lead Validation</FormLabel>
                     <FormControl>
                       <Input placeholder="" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="applicableRegulations"
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel>Réglementations Applicables</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

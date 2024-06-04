@@ -26,7 +26,7 @@ model Project {
   // clientProcessRepresentatives String @db.Text
   leadAMOA                    String   @db.Text
   leadValidation              String   @db.Text
-  // applicableRegulations String @db.Text
+  applicableRegulations       String   @db.Text
   providersMacro              String[] @db.Text
   providersDetailed           String[] @db.Text
 

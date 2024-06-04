@@ -15,6 +15,8 @@ export const lucia = new Lucia(adapter, {
       emailVerified: attributes.email_verified,
       email: attributes.email,
       role: attributes.role,
+      name: attributes.name,
+      surname: attributes.surname,
     };
   },
 });
@@ -26,6 +28,8 @@ declare module 'lucia' {
       email: string;
       email_verified: boolean;
       role: Role;
+      name: string;
+      surname: string;
     };
   }
 }

@@ -10,6 +10,8 @@ export interface AuthContext {
         id: string;
         email: string;
         role: UserRole;
+        name: string;
+        surname: string;
       }
     | null
     | undefined;
