@@ -22,8 +22,6 @@ import ProjectPage from '~/routes/projects/details';
 import type {
   CategoryStepCompleteDto,
   CategoryStepDatabaseDto,
-  CategoryStepDto,
-  ProjectDetailDatabaseDto,
   ProjectDetailedDto,
   ProjectDto,
   URSDatabaseDto,
