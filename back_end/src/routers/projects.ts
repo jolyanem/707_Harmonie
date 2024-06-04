@@ -1,16 +1,41 @@
 import express from 'express';
-import { db } from '../db';
-import { ProjectDetailedDto, ProjectDto, ProjectPatchDto } from '../types';
+import { db } from '../db.js';
+import type {
+  ProjectDetailedDto,
+  ProjectDto,
+  ProjectPatchDto,
+} from '../types.js';
 
 const projectsRouter = express.Router();
 
 projectsRouter
   .get('/', async (req, res) => {
     console.log('[GET] Projects');
+    if (res.locals.user?.role !== 'Collaborateur') {
+      const user = await db.user.findUnique({
+        where: {
+          id: res.locals.user?.id,
+        },
+      });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      const projects = await db.project.findMany({
+        where: {
+          client: user.employerName,
+        },
+      });
+      return res.json(projects satisfies Array<ProjectDto>);
+    }
     const projects = await db.project.findMany();
-    res.json(projects satisfies Array<ProjectDto>);
+    return res.json(projects satisfies Array<ProjectDto>);
   })
   .post('/', async (req, res) => {
+    if (res.locals.user?.role !== 'Collaborateur') {
+      return res.status(403).json({
+        message: '',
+      });
+    }
     console.log('[POST] Project :', req.body.name);
     const project = await db.project.create({
       data: {
@@ -28,6 +53,11 @@ projectsRouter
     res.json(project satisfies ProjectDto);
   })
   .patch('/:id', async (req, res) => {
+    if (res.locals.user?.role !== 'Collaborateur') {
+      return res.status(403).json({
+        message: '',
+      });
+    }
     console.log('[PATCH] Project :', req.params.id);
     const body = req.body as ProjectPatchDto;
     const project = await db.project.update({

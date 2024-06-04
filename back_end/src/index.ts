@@ -1,14 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import { db } from './db';
+import { db } from './db.js';
 import type {
   CategoryStepCompleteDto,
   CategoryStepDto,
   OperationalProcessLinkDto,
   ProjectDetailDatabaseDto,
-  ProjectDetailedDto,
-  ProjectDto,
-  ProjectPatchDto,
   RiskDto,
   SupplierResponsesDto,
   URSCreateDto,
@@ -16,22 +13,50 @@ import type {
   URSPutDto,
   URSShortDto,
   UserDto,
-} from './types';
-import { CategoryStep, Statut } from '@prisma/client';
-import jwt from 'jsonwebtoken';
-import { authRouter } from './routers/auth';
-import { usersRouter } from './routers/users';
-import { projectsRouter } from './routers/projects';
+} from './types.js';
+import type { CategoryStep, Session } from '@prisma/client';
+import { authRouter } from './routers/auth.js';
+import { usersRouter } from './routers/users.js';
+import { projectsRouter } from './routers/projects.js';
+import type { User } from 'lucia';
+import {
+  isAuthenticatedMiddleware,
+  originMiddleware,
+  sessionMiddleware,
+} from './lucia.js';
 
 const app = express();
 const port = 3000;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
+    credentials: true,
+  })
+);
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(originMiddleware);
+
+app.use(sessionMiddleware);
+
+declare global {
+  namespace Express {
+    interface Locals {
+      user: User | null;
+      session: Session | null;
+    }
+  }
+}
 
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy' });
 });
+
+app.use('/auth', authRouter);
+
+app.use(isAuthenticatedMiddleware);
 
 const getURSCodeNumber = async (categoryStepId: string, type: string) => {
   const urs = await db.uRS.findMany({
@@ -84,6 +109,11 @@ app
     res.json({ ...urs, categorySteps } satisfies URSDto);
   })
   .put('/urs/:id/step/:stepName/status', async (req, res) => {
+    if (res.locals.user?.role !== 'Collaborateur') {
+      return res.status(403).json({
+        message: '',
+      });
+    }
     console.log('[PUT] URS :', req.params.id, '> Step :', req.params.stepName);
     const ursId = req.params.id;
     const stepName = req.params.stepName;
@@ -102,6 +132,11 @@ app
     });
   })
   .post('/urs', async (req, res) => {
+    if (res.locals.user?.role !== 'Collaborateur') {
+      return res.status(403).json({
+        message: '',
+      });
+    }
     const body = req.body as URSCreateDto;
     console.log('[POST] URS');
     const urs = await db.uRS.create({
@@ -182,6 +217,11 @@ app
     res.json(urs satisfies URSShortDto);
   })
   .put('/urs/:id', async (req, res) => {
+    if (res.locals.user?.role !== 'Collaborateur') {
+      return res.status(403).json({
+        message: '',
+      });
+    }
     console.log('[PUT] URS :', req.params.id);
     const body = req.body as URSPutDto;
     const urs = await db.uRS.update({
@@ -200,6 +240,11 @@ app
     res.json(urs satisfies URSShortDto);
   })
   .put('/urs/:ursId/step/:stepName', async (req, res) => {
+    if (res.locals.user?.role !== 'Collaborateur') {
+      return res.status(403).json({
+        message: '',
+      });
+    }
     console.log(
       '[PUT] URS :',
       req.params.ursId,
@@ -513,6 +558,11 @@ app
   });
 
 app.get('/database/projects/:id', async (req, res) => {
+  if (res.locals.user?.role !== 'Collaborateur') {
+    return res.status(403).json({
+      message: 'You are not authorized to access this resource',
+    });
+  }
   console.log('[GET] Database Project :', req.params.id);
   const project = await db.project.findUnique({
     where: {
@@ -564,6 +614,11 @@ const getCategoryStepParents = async (parent?: CategoryStep | null) => {
 
 app
   .post('/projects/:projectId/step', async (req, res) => {
+    if (res.locals.user?.role !== 'Collaborateur') {
+      return res.status(403).json({
+        message: '',
+      });
+    }
     console.log('[POST] Category Step :', req.body.name);
     const categoryStep = await db.categoryStep.create({
       data: {
@@ -604,7 +659,6 @@ app
 
 app.use('/users', usersRouter);
 app.use('/projects', projectsRouter);
-app.use('/auth', authRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

@@ -105,7 +105,7 @@ model SupplierResponse {
   name            String  @db.Text
   statut          Boolean @default(false)
   answer          String  @db.Text
-  type            String  @db.Text // Custom or Standard
+  type            String  @db.Text
   customTmpsDev   Float   @default(0)
   customCost      Float   @default(0)
   customApprouved Boolean @default(false)
@@ -173,6 +173,8 @@ model ActionPlan {
   Risk Risk?
 }
 
+// --- AUTHENTICATION ---
+
 enum Role {
   Client
   Collaborateur
@@ -184,12 +186,29 @@ enum Statut {
 }
 
 model User {
-  id            String @id @default(cuid())
-  name          String @db.Text
-  surname       String @db.Text
-  email         String @unique @db.Text
-  employerName  String @db.Text
-  employerPhone String @db.Text
+  id            String  @id
+  name          String  @db.Text
+  surname       String  @db.Text
+  email         String  @unique @db.Text
+  emailVerified Boolean @default(false)
+  employerName  String  @db.Text
+  employerPhone String  @db.Text
   role          Role
   statut        Statut
+
+  sessions Session[]
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+}
+
+model EmailVerificationToken {
+  id        String   @id
+  userId    String
+  email     String
+  expiresAt DateTime
 }

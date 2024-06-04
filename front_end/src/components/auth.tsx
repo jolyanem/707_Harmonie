@@ -1,38 +1,64 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import type { UserRole } from 'backend-types';
 import * as React from 'react';
 
 export interface AuthContext {
-  isAuthenticated: boolean;
-  user: {
-    id: string;
-    email: string;
-    role: UserRole;
-  } | null;
-  token: string | null;
-  setAuth: (token: string) => void;
+  state: 'loading' | 'authenticated' | 'unauthenticated';
+  user:
+    | {
+        id: string;
+        email: string;
+        role: UserRole;
+      }
+    | null
+    | undefined;
+  logout: () => void;
+  login: () => Promise<unknown>;
 }
 
 const AuthContext = React.createContext<AuthContext | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = React.useState<AuthContext['user'] | null>(null);
-  const [token, setToken] = React.useState<AuthContext['token'] | null>('test');
+  const queryClient = useQueryClient();
+  const currentUserQuery = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => axios.get<AuthContext['user']>('/auth/user'),
+    select: (data) => data.data,
+    retry: false,
+  });
+  const logoutMutation = useMutation({
+    mutationKey: ['logout'],
+    mutationFn: async () => {
+      await axios.post('/auth/logout');
+    },
+    onSuccess: () => {
+      queryClient.resetQueries({ queryKey: ['currentUser'] });
+    },
+  });
+  const user = currentUserQuery.data;
   const isAuthenticated = !!user;
 
-  const setAuth = (token?: string) => {
-    if (token) {
-      const decoded = JSON.parse(atob(token.split('.')[1]));
-      setUser({
-        id: decoded.id,
-        email: decoded.email,
-        role: decoded.role,
-      });
-      setToken(token);
-    }
+  const logout = () => {
+    logoutMutation.mutate();
   };
 
+  const login = () =>
+    queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, token, setAuth }}>
+    <AuthContext.Provider
+      value={{
+        state: currentUserQuery.isLoading
+          ? 'loading'
+          : isAuthenticated
+          ? 'authenticated'
+          : 'unauthenticated',
+        user,
+        logout,
+        login,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
