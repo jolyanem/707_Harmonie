@@ -1,12 +1,12 @@
-import { Lucia, verifyRequestOrigin } from 'lucia';
+import { Lucia } from 'lucia';
 import { adapter } from './db.js';
 import type { Role } from '@prisma/client';
-import type { Request, Response, NextFunction } from 'express';
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
     attributes: {
       secure: process.env.NODE_ENV === 'PRODUCTION',
+      domain: process.env.FRONTEND_URL,
     },
     name: 'harmonie_auth_session',
   },
