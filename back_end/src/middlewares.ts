@@ -13,6 +13,9 @@ export async function originMiddleware(
   const originHeader = req.headers.origin ?? null;
   const hostHeader = req.headers.host ?? null;
 
+  console.log('Origin header', originHeader);
+  console.log('Host header', hostHeader);
+
   if (
     !originHeader ||
     !hostHeader ||
