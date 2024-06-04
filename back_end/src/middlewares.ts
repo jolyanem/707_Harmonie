@@ -2,6 +2,15 @@ import type { Response, NextFunction, Request } from 'express';
 import { lucia } from './lucia.js';
 import { verifyRequestOrigin } from 'lucia';
 
+export const loggerMiddleware = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
+  console.log(`[${req.method}] ${req.path}`);
+  next();
+};
+
 export async function originMiddleware(
   req: Request,
   res: Response,
@@ -13,9 +22,6 @@ export async function originMiddleware(
   const originHeader = req.headers.origin ?? null;
   const hostHeader = req.headers.host ?? null;
 
-  console.log('Origin header', originHeader);
-  console.log('Host header', hostHeader);
-
   if (
     !originHeader ||
     !hostHeader ||
@@ -24,7 +30,6 @@ export async function originMiddleware(
       process.env.FRONTEND_URL ?? 'http://localhost:5173',
     ])
   ) {
-    console.log('Origin not allowed', originHeader, hostHeader);
     return res.status(403).json({
       message: 'Forbidden',
     });
@@ -37,10 +42,7 @@ export const sessionMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log('session cookie', req.headers.cookie);
-
   const sessionId = lucia.readSessionCookie(req.headers.cookie ?? '');
-  console.log('Sessionid', sessionId);
 
   if (!sessionId) {
     res.locals.user = null;
@@ -49,8 +51,6 @@ export const sessionMiddleware = async (
   }
 
   const { session, user } = await lucia.validateSession(sessionId);
-  console.log('Session validated', session);
-  console.log('User validated', user);
 
   if (session && session.fresh) {
     res.appendHeader(

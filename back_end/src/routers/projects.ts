@@ -10,7 +10,6 @@ const projectsRouter = express.Router();
 
 projectsRouter
   .get('/', async (req, res) => {
-    console.log('[GET] Projects');
     if (res.locals.user?.role !== 'Collaborateur') {
       const user = await db.user.findUnique({
         where: {
@@ -36,7 +35,6 @@ projectsRouter
         message: '',
       });
     }
-    console.log('[POST] Project :', req.body.name);
     const project = await db.project.create({
       data: {
         name: req.body.name,
@@ -59,7 +57,6 @@ projectsRouter
         message: '',
       });
     }
-    console.log('[PATCH] Project :', req.params.id);
     const body = req.body as ProjectPatchDto;
     const project = await db.project.update({
       where: {
@@ -80,7 +77,6 @@ projectsRouter
     res.json(project satisfies ProjectDto);
   })
   .get('/:id', async (req, res) => {
-    console.log('[GET] Project :', req.params.id);
     const project = await db.project.findUnique({
       where: {
         id: parseInt(req.params.id),

@@ -16,12 +16,10 @@ usersRouter
     return next();
   })
   .get('/', async (req, res) => {
-    console.log('[GET] Users');
     const users = await db.user.findMany();
     res.json(users satisfies Array<UserDto>);
   })
   .post('/', async (req, res) => {
-    console.log('[POST] User :', req.body.email);
     try {
       const user = await db.user.create({
         data: {
@@ -43,7 +41,6 @@ usersRouter
   })
   .put('/:userId', async (req, res) => {
     const userId = req.params.userId;
-    console.log('[PUT] User ID:', userId);
     try {
       const {
         name,

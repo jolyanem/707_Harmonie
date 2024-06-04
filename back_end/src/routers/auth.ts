@@ -65,7 +65,7 @@ authRouter
     return res.status(200);
   })
   .post('/login', async (req, res) => {
-    console.log('[POST] Login');
+    ('[POST] Login');
     const { email } = req.body;
     const user = await db.user.findFirst({
       where: {
@@ -88,14 +88,13 @@ authRouter
       verificationToken;
     await sendVerificationEmail(email, verificationLink);
     return res.status(200).json({
-      status: 200,
-      success: true,
       message: 'Magic link sent.',
+      // TODO: Remove this
+      verificationLink,
     });
   })
   .get('/verify/:token', async (req, res) => {
     const verificationToken = req.params.token;
-    console.log('Token :', verificationToken);
     if (typeof verificationToken !== 'string') {
       return res.status(400).json({
         status: 400,

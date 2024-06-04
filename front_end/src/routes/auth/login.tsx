@@ -29,7 +29,9 @@ const LoginPage = () => {
   const loginMutation = useMutation({
     mutationKey: ['login'],
     mutationFn: (values: z.infer<typeof loginFormSchema>) =>
-      axios.post<z.infer<typeof loginFormSchema>>('/auth/login', values),
+      axios.post<{
+        verificationLink: string;
+      }>('/auth/login', values),
     onSuccess: () => {
       toast.success(
         'Un lien magique, vous permettant de vous connecter, a été envoyé à votre adresse email.'
@@ -53,29 +55,36 @@ const LoginPage = () => {
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="bg-white rounded-lg gap-4 max-w-lg w-full p-4 border grid"
-      >
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" className="mt-2 ml-auto">
-          Se connecter
-        </Button>
-      </form>
-    </Form>
+    <>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="bg-white rounded-lg gap-4 max-w-lg w-full p-4 border grid"
+        >
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="mt-2 ml-auto">
+            Se connecter
+          </Button>
+        </form>
+      </Form>
+      {loginMutation.data?.data?.verificationLink && (
+        <a href={loginMutation.data?.data?.verificationLink}>
+          {loginMutation.data?.data?.verificationLink}
+        </a>
+      )}
+    </>
   );
 };
 

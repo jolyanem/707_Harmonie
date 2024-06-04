@@ -21,6 +21,7 @@ import { projectsRouter } from './routers/projects.js';
 import type { User } from 'lucia';
 import {
   isAuthenticatedMiddleware,
+  loggerMiddleware,
   originMiddleware,
   sessionMiddleware,
 } from './middlewares.js';
@@ -28,19 +29,19 @@ import { databaseRouter } from './routers/database.js';
 
 const app = express();
 const port = 3000;
-const apiRouter = express.Router();
 
-apiRouter.use(
+app.use(
   cors({
     origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
     credentials: true,
   })
 );
-apiRouter.use(express.json());
-apiRouter.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+const apiRouter = express.Router();
+apiRouter.use(loggerMiddleware);
 apiRouter.use(originMiddleware);
-
 apiRouter.use(sessionMiddleware);
 
 declare global {
@@ -73,7 +74,6 @@ const getURSCodeNumber = async (categoryStepId: string, type: string) => {
 
 apiRouter
   .get('/urs/:id', async (req, res) => {
-    console.log('[GET] URS :', req.params.id);
     const id = req.params.id;
     const urs = await db.uRS.findUnique({
       where: {
@@ -114,7 +114,6 @@ apiRouter
         message: '',
       });
     }
-    console.log('[PUT] URS :', req.params.id, '> Step :', req.params.stepName);
     const ursId = req.params.id;
     const stepName = req.params.stepName;
     const step = await db.step.update({
@@ -138,7 +137,6 @@ apiRouter
       });
     }
     const body = req.body as URSCreateDto;
-    console.log('[POST] URS');
     const urs = await db.uRS.create({
       data: {
         code:
@@ -222,7 +220,6 @@ apiRouter
         message: '',
       });
     }
-    console.log('[PUT] URS :', req.params.id);
     const body = req.body as URSPutDto;
     const urs = await db.uRS.update({
       where: {
@@ -245,12 +242,7 @@ apiRouter
         message: '',
       });
     }
-    console.log(
-      '[PUT] URS :',
-      req.params.ursId,
-      '> Step :',
-      req.params.stepName
-    );
+
     const ursId = req.params.ursId;
     const stepName = req.params.stepName;
     const step = await db.step.update({
@@ -563,7 +555,6 @@ apiRouter.get('/database/projects/:id', async (req, res) => {
       message: 'You are not authorized to access this resource',
     });
   }
-  console.log('[GET] Database Project :', req.params.id);
   const project = await db.project.findUnique({
     where: {
       id: parseInt(req.params.id),
@@ -619,7 +610,7 @@ apiRouter
         message: '',
       });
     }
-    console.log('[POST] Category Step :', req.body.name);
+    '[POST] Category Step :', req.body.name;
     const categoryStep = await db.categoryStep.create({
       data: {
         name: req.body.name,
@@ -630,12 +621,6 @@ apiRouter
     res.json(categoryStep);
   })
   .get('/projects/:projectId/steps/:categoryStepId', async (req, res) => {
-    console.log(
-      '[GET] Project :',
-      req.params.projectId,
-      '> Category Step :',
-      req.params.categoryStepId
-    );
     const categoryStepId = req.params.categoryStepId;
     const categoryStep = await db.categoryStep.findUnique({
       where: {
