@@ -21,6 +21,7 @@ export async function originMiddleware(
       process.env.FRONTEND_URL ?? 'http://localhost:5173',
     ])
   ) {
+    console.log('Origin not allowed', originHeader, hostHeader);
     return res.status(403).json({
       message: 'Forbidden',
     });
@@ -33,7 +34,11 @@ export const sessionMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log('session cookie', req.headers.cookie);
+
   const sessionId = lucia.readSessionCookie(req.headers.cookie ?? '');
+  console.log('Session cookie', sessionId);
+
   if (!sessionId) {
     res.locals.user = null;
     res.locals.session = null;
@@ -41,6 +46,9 @@ export const sessionMiddleware = async (
   }
 
   const { session, user } = await lucia.validateSession(sessionId);
+  console.log('Session validated', session);
+  console.log('User validated', user);
+
   if (session && session.fresh) {
     res.appendHeader(
       'Set-Cookie',
